@@ -4,7 +4,7 @@
  * @Author: shadow3zz-zhouchenghao@whut.edu.cn
  * @Date: 2020-01-30 16:18:24
  * @LastEditors  : shadow3zz
- * @LastEditTime : 2020-01-30 16:57:20
+ * @LastEditTime : 2020-01-31 13:31:30
  */
 #pragma once
 
@@ -130,6 +130,7 @@ public:
     {
         return iterator(head->next);
     }
+    
     const_iterator begin() const
     {
         return const_iterator(head->next);

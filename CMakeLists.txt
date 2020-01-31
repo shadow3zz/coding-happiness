@@ -11,6 +11,8 @@ elseif(UNIX)
   MESSAGE("This is Linux.")
 endif()
 
+find_package(wxWidgets COMPONENTS core base)
+
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
 SET(CMAKE_C_COMPILER "/usr/bin/gcc") # 默认c编译器
@@ -35,6 +37,13 @@ AUX_SOURCE_DIRECTORY(src DIR_SRCS) # 添加源代码文件夹, 自动扫描所�
 add_executable(main  # 输出名为main的可执行文件
    ${DIR_SRCS}
 )
+
+if(wxWidgets_FOUND)
+  include(${wxWidgets_USE_FILE})
+  # and for each of your dependent executable/library targets:
+  target_link_libraries(main ${wxWidgets_LIBRARIES})
+  message("${wxWidgets_INCLUDE_DIRS}")
+endif()
 
 
 

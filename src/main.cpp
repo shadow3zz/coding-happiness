@@ -4,23 +4,31 @@
  * @Author: shadow3zz-zhouchenghao@whut.edu.cn
  * @Date: 2020-01-30 13:35:17
  * @LastEditors  : shadow3zz
- * @LastEditTime : 2020-01-30 17:07:37
+ * @LastEditTime : 2020-01-31 18:10:56
  */
 #include <iostream>
 #include <stdlib.h>
+#include <cstring>
+#include <wx/wx.h>
 #include "Vector.h"
+#include "List.h"
+#include "Stack.h"
+
 int a=1,b=2,c=3,d=4;
 double e=1.1,f=2.21;
 char* str[]={"aaa","aab","aac"};
 
 void example_vector();
 void example_list();
+void example_stack();
 
 int main(int argc, char const* argv[]){
     std::cout << "数据结构与算法分析 C++描述" << std::endl;
-    
+    wxString msg(wxT("ready!"));
+    std::cout << "测试wxwidgets：" << msg.mb_str() << std::endl;
     example_vector();
-
+    example_list();
+    example_stack();
     system("pause");
     return 0;
 }
@@ -53,4 +61,29 @@ void example_vector(){
     std::cout << std::endl;
 }
 
-void example_list(){}
+void example_list(){
+    List<char*> l_char;
+    for (int i = 0; i < strlen(*str); i++)
+    {
+        l_char.push_back(str[i]);
+    }
+    for (auto itr = l_char.begin(); itr!=l_char.end(); ++itr)
+    {
+        std::cout << *itr << " ";
+        
+    }
+    l_char.insert(++l_char.begin(), "ddd");
+    std::cout << std::endl;
+}
+
+void example_stack(){
+    Stack<double> s_double;
+    s_double.push(e);
+    s_double.push(f);
+    while (!s_double.empty())
+    {
+        std::cout << s_double.top() <<  " ";
+        s_double.pop();
+    }
+    std::cout << std::endl;
+}

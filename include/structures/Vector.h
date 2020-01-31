@@ -4,7 +4,7 @@
  * @Author: shadow3zz-zhouchenghao@whut.edu.cn
  * @Date: 2020-01-30 12:17:51
  * @LastEditors  : shadow3zz
- * @LastEditTime : 2020-01-30 16:12:27
+ * @LastEditTime : 2020-01-31 17:18:17
  */
 #pragma once
 #include <iostream>
@@ -41,6 +41,7 @@ public:
     //
     void push_back(const Object &x);
     void pop_back();
+    Object &back() {return objects[theSize-1];};
     const Object &back() const;
     //
     typedef Object *iterator;

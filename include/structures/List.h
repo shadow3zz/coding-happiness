@@ -4,7 +4,7 @@
  * @Author: shadow3zz-zhouchenghao@whut.edu.cn
  * @Date: 2020-01-30 16:18:24
  * @LastEditors  : shadow3zz
- * @LastEditTime : 2020-01-31 13:31:30
+ * @LastEditTime : 2020-02-02 00:53:57
  */
 #pragma once
 
@@ -28,10 +28,7 @@ public:
     public:
         const_iterator() : current(nullptr) {}
 
-        const Object &operator*() const
-        {
-            return retrieve();
-        }
+        const Object &operator*() const { return retrieve(); }
 
         const_iterator &operator++() // ++itr
         {
@@ -46,21 +43,12 @@ public:
             return old;
         }
 
-        bool operator==(const const_iterator &rhs) const
-        {
-            return current == rhs.current;
-        }
-        bool operator!=(const const_iterator &rhs) const
-        {
-            return !(*this == rhs);
-        }
+        bool operator==(const const_iterator &rhs) const { return current == rhs.current; }
+        bool operator!=(const const_iterator &rhs) const { return !(*this == rhs); }
 
     protected:
         Node *current;
-        Object &retrieve() const
-        {
-            return current->data;
-        }
+        Object &retrieve() const { return current->data; }
 
         explicit const_iterator(Node *p) : current(p) {}
 
@@ -72,14 +60,8 @@ public:
     public:
         iterator() = default;
 
-        Object &operator*()
-        {
-            return this->retrieve();
-        }
-        const Object &operator*() const
-        {
-            return const_iterator::operator*();
-        }
+        Object &operator*() { return this->retrieve(); }
+        const Object &operator*() const { return const_iterator::operator*(); }
 
         iterator &operator++()
         {
@@ -100,10 +82,7 @@ public:
     };
 
 public:
-    List()
-    {
-        init();
-    }
+    List() { init(); }
     List(const List &rhs)
     {
         init();
@@ -126,73 +105,31 @@ public:
         return *this;
     }
 
-    iterator begin()
-    {
-        return iterator(head->next);
-    }
-    
-    const_iterator begin() const
-    {
-        return const_iterator(head->next);
-    }
+    iterator begin() { return iterator(head->next); }
 
-    iterator end()
-    {
-        return iterator(tail);
-    }
-    const_iterator end() const
-    {
-        return const_iterator(tail);
-    }
+    const_iterator begin() const { return const_iterator(head->next); }
 
-    int size() const
-    {
-        return theSize;
-    }
-    bool empty() const
-    {
-        return size() == 0;
-    }
+    iterator end() { return iterator(tail); }
+    const_iterator end() const { return const_iterator(tail); }
+
+    int size() const { return theSize; }
+    bool empty() const { return size() == 0; }
     void clear()
     {
         while (!empty())
             pop_front();
     }
 
-    Object &front()
-    {
-        return *begin();
-    }
-    const Object &front() const
-    {
-        return *begin();
-    }
+    Object &front() { return *begin(); }
+    const Object &front() const { return *begin(); }
 
-    Object &back()
-    {
-        return *--end();
-    }
-    const Object &back() const
-    {
-        return *--end();
-    }
+    Object &back() { return *--end(); }
+    const Object &back() const { return *--end(); }
 
-    void push_front(const Object &x)
-    {
-        insert(begin(), x);
-    }
-    void push_back(const Object &x)
-    {
-        insert(end(), x);
-    }
-    void pop_front()
-    {
-        erase(begin());
-    }
-    void pop_back()
-    {
-        erase(--end());
-    }
+    void push_front(const Object &x) { insert(begin(), x); }
+    void push_back(const Object &x) { insert(end(), x); }
+    void pop_front() { erase(begin()); }
+    void pop_back() { erase(--end()); }
 
     iterator insert(iterator pos, const Object &x)
     {
@@ -230,4 +167,31 @@ private:
         head->next = tail;
         tail->prev = head;
     }
+
+
+public:
+    //3.2 交换两个相邻元素
+    void swapWithNext(Node *p){
+        Node *beforep, *afterp;
+        beforep = p->prev;
+        afterp = p->next;
+        
+        beforep->next = afterp;
+        p->next = afterp->next;
+        after->next->prev = p;
+        afterp->prev = beforep;
+        afterp->next = p;
+        p->prev = afterp;
+    }
+    //3.3 实现find
+    template<typename Iterator, typename Object>
+    iterator find(Iterator start, Iterator end, const Object& x)
+    {
+        for(;start!=end; start++)
+            if (*start == x)
+                break;
+        return start;
+    }
+    
 };
+

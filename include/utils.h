@@ -4,18 +4,32 @@
  * @Author: shadow3zz-zhouchenghao@whut.edu.cn
  * @Date: 2020-01-31 21:49:23
  * @LastEditors  : shadow3zz
- * @LastEditTime : 2020-02-01 16:45:30
+ * @LastEditTime : 2020-02-02 22:52:36
  */
 
 #pragma once
 #include <cstring>
 #include <iostream>
 #include <stack>
+#include <list>
 #include <vector>
 #include <iterator>
+#include <cmath>
+
+#define INT_MAX 2147483648
+#define INT_MIN -2147483648
+
 using namespace std;
 class Solution
 {
+private:
+    struct ListNode
+    {
+        int val;
+        ListNode *next;
+        ListNode(int x) : val(x), next(NULL) {}
+    };
+
 public:
     /**
      * @name: 8. 字符串转换整数 (atoi)
@@ -31,11 +45,70 @@ public:
      */
     int myAtoi(string str)
     {
-        while (&str)
+        int number = 0;
+        int strlength = str.length();
+        list<int> numbers;
+
+        int flag = 0;
+        char num[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
+        int i = 0;
+        while (i < strlength)
         {
-            /* code */
+            if (str[i] == ' ')
+            {
+                if (!numbers.empty() || flag != 0)
+                    break;
+                i++;
+                continue;
+            }
+
+            else if (str[i] == '+')
+            {
+                if (!numbers.empty())
+                    break;
+                if (flag != 0)
+                    return 0;
+                flag = 1;
+                i++;
+                continue;
+            }
+            else if (str[i] == '-')
+            {
+                if (!numbers.empty())
+                    break;
+                if (flag != 0)
+                    return 0;
+                flag = -1;
+                i++;
+                continue;
+            }
+            else if (isdigit(str[i]))
+            {
+                numbers.push_back(str[i] - '0');
+                i++;
+                continue;
+            }
+            else
+            {
+                if (numbers.empty())
+                    return 0;
+                else
+                    break;
+            }
+            /*code*/
         }
-        
+        while (!numbers.empty())
+        {
+
+            if (number > INT_MAX / 10 || (number == INT_MAX / 10 && numbers.back() > 7))
+            {
+                return flag == -1 ? INT_MIN : INT_MAX;
+            }
+
+            number = number * 10 + numbers.front();
+            numbers.pop_front();
+        }
+        return flag == -1 ? -number : number;
     }
 
     /**
@@ -109,6 +182,42 @@ public:
             return false;
         return true;
     }
+
+    /**
+     * @name: 21. 合并两个有序链表(迭代法)
+     * @msg: 将两个有序链表合并为一个新的有序链表并返回。新链表是通过拼接给定的两个链表的所有节点组成的。 
+     * 输入：1->2->4, 1->3->4
+     * 输出：1->1->2->3->4->4
+     */
+    ListNode *mergeTwoLists(ListNode *l1, ListNode *l2)
+    {
+        if (l1 == nullptr)
+            return l2;
+        if (l2 == nullptr)
+            return l1;
+        ListNode *result = new ListNode(0);
+        ListNode *temp = result;
+        while (l1 != NULL && l2 != NULL)
+        {
+            if (l1->val <= l2->val)
+            {
+                temp->next = l1;
+                l1 = l1->next;
+            }
+            else
+            {
+                temp->next = l2;
+                l2 = l2->next;
+            }
+            temp = temp->next;
+        }
+        if (l1 == NULL)
+            temp->next = l2;
+        if (l2 == NULL)
+            temp->next = l1;
+        return result->next;
+    }
+
     /**
      * @name: 22. 括号生成
      * @msg: 给出 n 代表生成括号的对数，请你写出一个函数，使其能够生成所有可能的并且有效的括号组合。
@@ -123,7 +232,6 @@ public:
      */
     vector<string> generateParenthesis(int n)
     {
-        
     }
     /**
      * @name: 28.实现 strStr()

@@ -4,7 +4,7 @@
  * @Author: shadow3zz-zhouchenghao@whut.edu.cn
  * @Date: 2020-01-30 16:18:24
  * @LastEditors  : shadow3zz
- * @LastEditTime : 2020-02-02 00:53:57
+ * @LastEditTime : 2020-02-02 12:17:19
  */
 #pragma once
 
@@ -178,13 +178,13 @@ public:
         
         beforep->next = afterp;
         p->next = afterp->next;
-        after->next->prev = p;
+        afterp->next->prev = p;
         afterp->prev = beforep;
         afterp->next = p;
         p->prev = afterp;
     }
     //3.3 实现find
-    template<typename Iterator, typename Object>
+    template<typename Iterator>
     iterator find(Iterator start, Iterator end, const Object& x)
     {
         for(;start!=end; start++)

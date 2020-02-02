@@ -4,13 +4,12 @@
  * @Author: shadow3zz-zhouchenghao@whut.edu.cn
  * @Date: 2020-01-30 13:35:17
  * @LastEditors  : shadow3zz
- * @LastEditTime : 2020-02-02 00:21:38
+ * @LastEditTime : 2020-02-02 18:39:48
  */
 #include <iostream>
 #include <stdlib.h>
 #include <cstring>
 // #include <wx/wx.h>
-#include <time.h>
 #include "Vector.h"
 #include "List.h"
 #include "Stack.h"
@@ -34,8 +33,8 @@ int main(int argc, char const *argv[])
     // example_vector();
     // example_list();
     // example_stack();
-    // leetcode_test();
-    book_exec();
+    leetcode_test();
+    // book_exec();
     system("pause");
     return 0;
 }
@@ -100,7 +99,9 @@ void example_stack()
 void leetcode_test()
 {
     Solution s;
-
+    // 8
+    std::string str_num = "-2147483646";
+    std::cout << s.myAtoi(str_num) << std::endl; 
     // 9
     int Palindrome_1 = 1234321;
     int Palindrome_2 = 123321;
@@ -117,19 +118,10 @@ void leetcode_test()
 #include "exercises.hpp"
 void book_exec()
 {
-    clock_t startTime, endTime;
-    list<char *> l_char;
-    list<int> count;
-    count.push_back(int(1));
-    count.push_back(3);
-    count.push_back(4);
-    int n =sizeof(str)/sizeof(char*);
-    for (int i = 0; i < n; i++)
-    {
-        l_char.push_back(str[i]);
-    }
-    startTime = clock();
-    printLots(l_char, count);
-    endTime = clock();
-    std::cout << "The run time is: " << (double)(endTime - startTime) / CLOCKS_PER_SEC << "s" << std::endl;
+    std::cout << "习题3.1：";
+    exec_3_1();
+    std::cout << "习题3.4：";
+    exec_3_4();
+    std::cout << "习题3.5：";
+    exec_3_5();
 }

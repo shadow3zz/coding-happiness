@@ -4,7 +4,7 @@
  * @Author: shadow3zz-zhouchenghao@whut.edu.cn
  * @Date: 2020-01-30 13:35:17
  * @LastEditors  : shadow3zz
- * @LastEditTime : 2020-02-02 18:39:48
+ * @LastEditTime : 2020-02-03 15:06:28
  */
 #include <iostream>
 #include <stdlib.h>
@@ -33,8 +33,8 @@ int main(int argc, char const *argv[])
     // example_vector();
     // example_list();
     // example_stack();
-    leetcode_test();
-    // book_exec();
+    // leetcode_test();
+    book_exec();
     system("pause");
     return 0;
 }
@@ -118,10 +118,12 @@ void leetcode_test()
 #include "exercises.hpp"
 void book_exec()
 {
-    std::cout << "习题3.1：";
-    exec_3_1();
-    std::cout << "习题3.4：";
-    exec_3_4();
-    std::cout << "习题3.5：";
-    exec_3_5();
+    // std::cout << "习题3.1：";
+    // exec_3_1();
+    // std::cout << "习题3.4：";
+    // exec_3_4();
+    // std::cout << "习题3.5：";
+    // exec_3_5();
+    std::cout << "习题3.6：";
+    exec_3_6();
 }

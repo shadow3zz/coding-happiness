@@ -4,7 +4,7 @@
  * @Author: shadow3zz-zhouchenghao@whut.edu.cn
  * @Date: 2020-01-30 12:17:51
  * @LastEditors  : shadow3zz
- * @LastEditTime : 2020-01-31 17:18:17
+ * @LastEditTime : 2020-02-03 15:38:32
  */
 #pragma once
 #include <iostream>
@@ -112,13 +112,21 @@ void Vector<Object>::reserve(int newCapacity)
 template <class Object>
 Object &Vector<Object>::operator[](int index)
 {
-    return objects[index];
+    if (index > 0 || index < theSize)
+        return objects[index];
+    else
+        std::cout << "index out of bounds!" << std::endl;;
+        return objects[0];
 }
 
 template <class Object>
 const Object &Vector<Object>::operator[](int index) const
 {
-    return objects[index];
+    if (index > 0 || index < theSize)
+        return objects[index];
+    else
+        std::cout << "index out of bounds!" << std::endl;;
+        return objects[0];
 }
 
 template <typename Object>

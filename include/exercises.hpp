@@ -4,7 +4,7 @@
  * @Author: shadow3zz-zhouchenghao@whut.edu.cn
  * @Date: 2020-02-01 17:15:09
  * @LastEditors  : shadow3zz
- * @LastEditTime : 2020-02-02 13:20:00
+ * @LastEditTime : 2020-02-03 15:34:27
  */
 #pragma once
 #include <iostream>
@@ -89,7 +89,7 @@ list<Object> intersection(list<Object> &L_1, list<Object> &L_2)
 void exec_3_4()
 {
     list<int> list_1 = {1, 2, 3, 4, 5, 6};
-    list<int> list_2 = {2, 4,  5};
+    list<int> list_2 = {2, 4, 5};
     for (auto s : intersection(list_1, list_2))
         std::cout << s << "";
     std::cout << std::endl;
@@ -111,7 +111,8 @@ list<Object> listUnion(list<Object> &L_1, list<Object> &L_2)
         if (*itr_1 == *itr_2)
         {
             result.push_back(*itr_1);
-            itr_1++;itr_2++;
+            itr_1++;
+            itr_2++;
         }
         else if (*itr_1 < *itr_2)
         {
@@ -134,6 +135,63 @@ void exec_3_5()
     for (auto s : listUnion(list_1, list_2))
         std::cout << s << "";
     std::cout << std::endl;
+}
+
+/**
+ * @name: 课后习题3.6
+ * @msg: Josephus问题是下面的这个游戏：有N个人坐成一圈，编号为1至N。从编号为1的人开始传递热马铃薯。M次传递后，持有热马铃薯的人
+ * 退出游戏，圈缩小，然后游戏从退出人下面的人开始，继续进行。最终留下来的人获胜。这样，如果M=0并且N=5，那么参加游戏的人依次退出，
+ * 5号获胜。如果M=1并且N=5，那么退出的顺序就是2、4、1、5.
+ * @tips: M%N
+ */
+void JosephusProblem(int M, int N)
+{
+    list<int> circle;
+    for (int i = 0; i < N; i++)
+    {
+        circle.push_back(i + 1);
+    }
+
+    typename list<int>::iterator itr = circle.begin();
+#if 0
+    int lastPos = 0;
+    while (!circle.empty())
+    {
+        for (int k = 0; k < M; ++k)  // 可以优化k，现在如果M很大，N很小需要多次循环，可以利用M%N的结果作一次循环
+        {
+            itr++;
+            if (itr == circle.end())
+                itr = circle.begin();
+        }
+        lastPos = *itr;
+        itr = circle.erase(itr);
+        if (itr == circle.end()) 
+            itr = circle.begin();
+    }
+    std::cout << "The winner is No." << lastPos << std::endl;
+#else
+    int nextPos;
+    int lastPos = 0;
+    while (!circle.empty())
+    {
+         nextPos = M % circle.size();
+        for (int k = 0; k < nextPos; ++k) 
+        {
+            itr++;
+            if (itr == circle.end())
+                itr = circle.begin();
+        }
+        lastPos = *itr;
+        itr = circle.erase(itr);       
+        if (itr == circle.end()) 
+            itr = circle.begin();
+    }
+    std::cout << "The winner is No." << lastPos << std::endl;
+#endif
+}
+void exec_3_6()
+{
+    JosephusProblem(0, 5);
 }
 
 

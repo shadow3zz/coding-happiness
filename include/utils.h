@@ -4,7 +4,7 @@
  * @Author: shadow3zz-zhouchenghao@whut.edu.cn
  * @Date: 2020-01-31 21:49:23
  * @LastEditors  : shadow3zz
- * @LastEditTime : 2020-02-02 22:52:36
+ * @LastEditTime : 2020-02-03 12:01:57
  */
 
 #pragma once
@@ -278,4 +278,74 @@ public:
     bool repeatedSubstringPattern(string s)
     {
     }
+
+    /**
+     * @name: 622. 设计循环队列
+     * @msg: 设计你的循环队列实现。 循环队列是一种线性数据结构，其操作表现基于 FIFO（先进先出）原则并且队尾被连接在队首之后以形成一个循环。
+     * 它也被称为“环形缓冲器”。 循环队列的一个好处是我们可以利用这个队列之前用过的空间。在一个普通队列里，一旦一个队列满了，
+     * 我们就不能插入下一个元素，即使在队列前面仍有空间。但是使用循环队列，我们能使用这些空间去存储新的值。 
+     * Your MyCircularQueue object will be instantiated and called as such:
+     * MyCircularQueue* obj = new MyCircularQueue(k);
+     * bool param_1 = obj->enQueue(value);
+     * bool param_2 = obj->deQueue();
+     * int param_3 = obj->Front();
+     * int param_4 = obj->Rear();
+     * bool param_5 = obj->isEmpty();
+     * bool param_6 = obj->isFull();
+     */   
+    class MyCircularQueue {
+    private:
+        //int theSize; // 依靠队列为空时的基准情形来记录大小
+        std::vector<int> data;
+        int front, rear;
+        int maxSize;
+    public:
+        /** Initialize your data structure here. Set the size of the queue to be k. */
+        explicit MyCircularQueue(int k) 
+            : maxSize(k+1), front(0), rear(0)
+        { data.resize(maxSize); }
+
+        /** Insert an element into the circular queue. Return true if the operation is successful. */
+        bool enQueue(int value) {
+            if (isFull()) return false;
+            else {
+                data[rear] = value;
+                rear = (rear+1)%maxSize;
+                return true;
+            }
+        }
+
+        /** Delete an element from the circular queue. Return true if the operation is successful. */
+        bool deQueue() {
+            if (isEmpty()) return false;
+            else {
+                front = (front+1)%maxSize;
+                return true;
+            }
+        }
+
+        /** Get the front item from the queue. */
+        int Front() {
+            if (isEmpty()) return -1;
+            return data[front];
+        }
+
+        /** Get the last item from the queue. */
+        int Rear() {
+            if (isEmpty()) return -1;
+            if (rear == 0) return data[maxSize-1];
+            return data[rear-1];
+        }
+
+        /** Checks whether the circular queue is empty or not. */
+        bool isEmpty() {
+            return front == rear;
+        }
+
+        /** Checks whether the circular queue is full or not. */
+        bool isFull() {
+            return (rear+1)%maxSize == front;
+        }
+    };
+
 };

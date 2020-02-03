@@ -278,9 +278,11 @@
 
 有两种选择
 
-①安装wxWidgets3.0.1[csdn](https://blog.csdn.net/qq_32768743/article/details/83220719)
+①安装wxWidgets3.0.1[csdn](https://blog.csdn.net/qq_32768743/article/details/83220719)或者[opencpn](https://opencpn.org/wiki/dokuwiki/doku.php?id=opencpn:developer_manual:developer_guide:compiling_linux)
 
-    `sudo apt install libwxgtk3.0-dev`
+    `sudo apt install libwxgtk3.0-dev`  (csdn)
+
+    `sudo apt-get install build-essential cmake gettext git-core gpsd gpsd-clients libgps-dev wx-common libwxgtk3.0-dev libglu1-mesa-dev libgtk2.0-dev wx3.0-headers libbz2-dev libtinyxml-dev libportaudio2 portaudio19-dev libcurl4-openssl-dev libexpat1-dev libcairo2-dev libarchive-dev liblzma-dev libexif-dev libelf-dev libsqlite3-dev`   (opencpn)
 
 ②安装wxWidgets3.1.2[codelite](https://wiki.codelite.org/pmwiki.php/Main/WxWidgets312Binaries)
 

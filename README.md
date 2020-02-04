@@ -393,8 +393,6 @@ std::string newPrint(std::string str)
 
     wxwidgets在vscode中的使用问题 [wxWidgets and VSCode](http://wxwidgets.10942.n7.nabble.com/wxWidgets-and-VSCode-td93506.html)
 
-# day 3
-
 ## 安装wxWidgets
 
 ### 1 配置vcpkg来安装 不可行

@@ -4,7 +4,7 @@
  * @Author: shadow3zz-zhouchenghao@whut.edu.cn
  * @Date: 2020-01-30 13:35:17
  * @LastEditors  : shadow3zz
- * @LastEditTime : 2020-02-03 15:06:28
+ * @LastEditTime : 2020-02-08 15:10:42
  */
 #include <iostream>
 #include <stdlib.h>
@@ -33,8 +33,8 @@ int main(int argc, char const *argv[])
     // example_vector();
     // example_list();
     // example_stack();
-    // leetcode_test();
-    book_exec();
+    leetcode_test();
+    // book_exec();
     system("pause");
     return 0;
 }
@@ -99,6 +99,7 @@ void example_stack()
 void leetcode_test()
 {
     Solution s;
+#if 0
     // 8
     std::string str_num = "-2147483646";
     std::cout << s.myAtoi(str_num) << std::endl; 
@@ -107,12 +108,18 @@ void leetcode_test()
     int Palindrome_2 = 123321;
     s.isPalindrome(Palindrome_1);
     s.isPalindrome(Palindrome_2);
-    //
+    //20
     std::string Effectivebrackets = "(){}{()}";
     s.isValid(Effectivebrackets);
-    //
+    //28
     std::string str1 = "hello", str2 = "ll";
     s.strStr(str1, str2);
+    //38
+    std::cout << s.countAndSay(6) << std::endl;;
+#else
+    //1041
+    s.isRobotBounded("GGRGGRGGRGGR");
+#endif
 }
 
 #include "exercises.hpp"

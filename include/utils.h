@@ -4,7 +4,7 @@
  * @Author: shadow3zz-zhouchenghao@whut.edu.cn
  * @Date: 2020-01-31 21:49:23
  * @LastEditors  : shadow3zz
- * @LastEditTime : 2020-02-03 12:01:57
+ * @LastEditTime : 2020-02-08 17:22:56
  */
 
 #pragma once
@@ -23,13 +23,6 @@ using namespace std;
 class Solution
 {
 private:
-    struct ListNode
-    {
-        int val;
-        ListNode *next;
-        ListNode(int x) : val(x), next(NULL) {}
-    };
-
 public:
     /**
      * @name: 8. 字符串转换整数 (atoi)
@@ -189,6 +182,12 @@ public:
      * 输入：1->2->4, 1->3->4
      * 输出：1->1->2->3->4->4
      */
+    struct ListNode
+    {
+        int val;
+        ListNode *next;
+        ListNode(int x) : val(x), next(NULL) {}
+    };
     ListNode *mergeTwoLists(ListNode *l1, ListNode *l2)
     {
         if (l1 == nullptr)
@@ -262,6 +261,127 @@ public:
             return 0;
         }
     }
+
+    /**
+     * @name: 38. 外观数列
+     * @msg: 「外观数列」是一个整数序列，从数字 1 开始，序列中的每一项都是对前一项的描述。
+     * 前五项如下：
+     * 1.     1
+     * 2.     11
+     * 3.     21
+     * 4.     1211
+     * 5.     111221
+     */
+    string countAndSay(int n)
+    {
+        if (n == 1)
+        {
+            return "1";
+        }
+        else
+        {
+            string temp = countAndSay(n - 1);
+            int count = 1;
+            if (temp == "1")
+                return to_string(count) + "1";
+            else
+            {
+                string str;
+                for (int i = 0; i < temp.length() - 1; i++)
+                {
+
+                    if (temp[i] == temp[i + 1])
+                    {
+                        count++;
+                        if (i == temp.length() - 2)
+                        {
+                            return str + to_string(count) + temp[i];
+                        }
+                        continue;
+                    }
+                    else if (count == 1 && temp[i] != temp[i + 1])
+                    {
+                        str += to_string(count) + temp[i];
+                        if (i == temp.length() - 2)
+                        {
+                            return str + to_string(count) + temp[i + 1];
+                        }
+                        continue;
+                    }
+                    else
+                    {
+                        str += to_string(count) + temp[i];
+                        count = 1;
+                        if (i == temp.length() - 2)
+                        {
+                            return str + to_string(count) + temp[i + 1];
+                        }
+                        continue;
+                    }
+                }
+                return str;
+            }
+        }
+    }
+    // Tree
+    struct TreeNode
+    {
+        int val;
+        TreeNode *left;
+        TreeNode *right;
+        TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+    };
+    /**
+     * @name: 102.二叉树的层次遍历
+     * @msg: 给定一个二叉树，返回其按层次遍历的节点值。 （即逐层地，从左到右访问所有节点）
+     */    
+    vector<vector<int>> levelOrder(TreeNode* root) {
+        vector<vector<int>> result;
+        if (!root) return result;
+        int depth = maxDepth(root);
+        
+    }
+    /**
+     * @name: 104.二叉树的最大深度
+     * @msg: 给定一个二叉树，找出其最大深度。
+     * 二叉树的深度为根节点到最远叶子节点的最长路径上的节点数。
+     * 说明: 叶子节点是指没有子节点的节点。
+     */    
+    int maxDepth(TreeNode* root) {
+        if(!root) return 0;
+        if(!root->left && !root->right) return 1;
+        
+        return max(maxDepth(root->left), maxDepth(root->right))+1;
+    }
+    /**
+     * @name: 110.平衡二叉树
+     * @msg: 给定一个二叉树，判断它是否是高度平衡的二叉树。
+     */
+    
+    bool isBalanced(TreeNode *root)
+    {
+        return process(root) != -1;
+    }
+    // -1为不平衡
+    int process(TreeNode *root)
+    {
+        if (!root)
+            return 0; //根节点定义返回值为0
+        if (!root->left && !root->right)
+            return 1; //叶结点定义返回值为1;
+
+        int left_subtree_height = process(root->left);
+        if (left_subtree_height == -1)
+            return -1;
+        int right_subtree_height = process(root->right);
+        if (right_subtree_height == -1)
+            return -1;
+
+        if (abs(left_subtree_height - right_subtree_height) > 1)
+            return -1;
+
+        return max(left_subtree_height, right_subtree_height) + 1;
+    }
     /**
      * @name: 224. 基本计算器
      * @msg: 实现一个基本的计算器来计算一个简单的字符串表达式的值。字符串表达式可以包含左括号 ( ，右括号 )，加号 + ，减号 -，非负整数和空格  。
@@ -292,60 +412,120 @@ public:
      * int param_4 = obj->Rear();
      * bool param_5 = obj->isEmpty();
      * bool param_6 = obj->isFull();
-     */   
-    class MyCircularQueue {
+     */
+    class MyCircularQueue
+    {
     private:
         //int theSize; // 依靠队列为空时的基准情形来记录大小
         std::vector<int> data;
         int front, rear;
         int maxSize;
+
     public:
         /** Initialize your data structure here. Set the size of the queue to be k. */
-        explicit MyCircularQueue(int k) 
-            : maxSize(k+1), front(0), rear(0)
-        { data.resize(maxSize); }
+        explicit MyCircularQueue(int k)
+            : maxSize(k + 1), front(0), rear(0)
+        {
+            data.resize(maxSize);
+        }
 
         /** Insert an element into the circular queue. Return true if the operation is successful. */
-        bool enQueue(int value) {
-            if (isFull()) return false;
-            else {
+        bool enQueue(int value)
+        {
+            if (isFull())
+                return false;
+            else
+            {
                 data[rear] = value;
-                rear = (rear+1)%maxSize;
+                rear = (rear + 1) % maxSize;
                 return true;
             }
         }
 
         /** Delete an element from the circular queue. Return true if the operation is successful. */
-        bool deQueue() {
-            if (isEmpty()) return false;
-            else {
-                front = (front+1)%maxSize;
+        bool deQueue()
+        {
+            if (isEmpty())
+                return false;
+            else
+            {
+                front = (front + 1) % maxSize;
                 return true;
             }
         }
 
         /** Get the front item from the queue. */
-        int Front() {
-            if (isEmpty()) return -1;
+        int Front()
+        {
+            if (isEmpty())
+                return -1;
             return data[front];
         }
 
         /** Get the last item from the queue. */
-        int Rear() {
-            if (isEmpty()) return -1;
-            if (rear == 0) return data[maxSize-1];
-            return data[rear-1];
+        int Rear()
+        {
+            if (isEmpty())
+                return -1;
+            if (rear == 0)
+                return data[maxSize - 1];
+            return data[rear - 1];
         }
 
         /** Checks whether the circular queue is empty or not. */
-        bool isEmpty() {
+        bool isEmpty()
+        {
             return front == rear;
         }
 
         /** Checks whether the circular queue is full or not. */
-        bool isFull() {
-            return (rear+1)%maxSize == front;
+        bool isFull()
+        {
+            return (rear + 1) % maxSize == front;
         }
     };
 
+    /**
+     * @name: 1041. 困于环中的机器人
+     * @msg: 在无限的平面上，机器人最初位于 (0, 0) 处，面朝北方。机器人可以接受下列三条指令之一：
+     * "G"：直走 1 个单位
+     * "L"：左转 90 度
+     * "R"：右转 90 度
+     * 机器人按顺序执行指令 instructions，并一直重复它们。
+     * 只有在平面中存在环使得机器人永远无法离开时，返回 true。否则，返回 false。
+     * @tip: 如果可以循环最多执行四次，如果不可以循环，一定是因为第一次结束后点的位置不是（0，0）且指向正北
+     * 
+     */
+    bool isRobotBounded(string instructions)
+    {
+        int x = 0, y = 0;
+        double thea = M_PI / 2;
+        for (auto s : instructions)
+        {
+            if (thea >= M_PI * 2)
+                thea -= M_PI * 2;
+            if (thea < 0)
+                thea += M_PI * 2;
+            switch (s)
+            {
+            case 'G':
+                std::cout << "(" << cos(thea) << "," << sin(thea) << ")" << std::endl;
+                x += int(cos(thea));
+                y += int(sin(thea));
+                break;
+            case 'L':
+                thea += M_PI / 2;
+                break;
+            case 'R':
+                thea -= M_PI / 2;
+                break;
+            default:
+                break;
+            }
+        }
+        if ((x != 0 || y != 0) && (thea == M_PI / 2))
+            return false;
+        else
+            return true;
+    }
 };

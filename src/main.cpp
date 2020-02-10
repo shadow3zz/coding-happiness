@@ -4,7 +4,7 @@
  * @Author: shadow3zz-zhouchenghao@whut.edu.cn
  * @Date: 2020-01-30 13:35:17
  * @LastEditors  : shadow3zz
- * @LastEditTime : 2020-02-08 15:10:42
+ * @LastEditTime : 2020-02-11 00:17:44
  */
 #include <iostream>
 #include <stdlib.h>
@@ -13,6 +13,7 @@
 #include "Vector.h"
 #include "List.h"
 #include "Stack.h"
+#include "AvlTree.hpp"
 #include "utils.h"
 
 int a = 1, b = 2, c = 3, d = 4;
@@ -22,6 +23,7 @@ char *str[] = {"aaa", "aab", "aac", "zhouzhou", "yiyi"};
 void example_vector();
 void example_list();
 void example_stack();
+void exmaple_avltree();
 void leetcode_test();
 void book_exec();
 
@@ -33,7 +35,8 @@ int main(int argc, char const *argv[])
     // example_vector();
     // example_list();
     // example_stack();
-    leetcode_test();
+    exmaple_avltree();
+    // leetcode_test();
     // book_exec();
     system("pause");
     return 0;
@@ -96,6 +99,18 @@ void example_stack()
     std::cout << std::endl;
 }
 
+void exmaple_avltree(){
+    int N = 16;
+    AvlTree<int> T;
+    T.makeEmpty();
+    int a[] = {1, 2, 3, 4, 5, 6, 7, 16, 15, 14, 13, 12, 11, 10, 8, 9};
+    for (int i = 0; i < N; ++i) {
+        T.insert(a[i]);
+    }
+    T.printTree();
+    std::cout<<T.isValid()<<std::endl;
+}
+
 void leetcode_test()
 {
     Solution s;
@@ -116,9 +131,11 @@ void leetcode_test()
     s.strStr(str1, str2);
     //38
     std::cout << s.countAndSay(6) << std::endl;;
-#else
+
     //1041
     s.isRobotBounded("GGRGGRGGRGGR");
+#else
+
 #endif
 }
 
@@ -131,6 +148,6 @@ void book_exec()
     // exec_3_4();
     // std::cout << "习题3.5：";
     // exec_3_5();
-    std::cout << "习题3.6：";
-    exec_3_6();
+    // std::cout << "习题3.6：";
+    // exec_3_6();
 }

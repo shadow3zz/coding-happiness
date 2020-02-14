@@ -1,19 +1,21 @@
 /*
- * @Descripttion: leetcode
+ * @Descripttion: leetcode代码调试用
  * @version: WSL:Ubuntu-16.04
  * @Author: shadow3zz-zhouchenghao@whut.edu.cn
  * @Date: 2020-01-31 21:49:23
  * @LastEditors  : shadow3zz
- * @LastEditTime : 2020-02-08 17:22:56
+ * @LastEditTime : 2020-02-14 23:42:39
  */
 
 #pragma once
 #include <cstring>
 #include <iostream>
 #include <stack>
+#include <queue>
 #include <list>
 #include <vector>
 #include <iterator>
+#include <algorithm>
 #include <cmath>
 
 #define INT_MAX 2147483648
@@ -332,32 +334,172 @@ public:
         TreeNode(int x) : val(x), left(NULL), right(NULL) {}
     };
     /**
+     * @name: 94.二叉树的中序遍历
+     * @msg: 给定一个二叉树，返回它的中序 遍历。
+     */
+    vector<int> inorderTraversal(TreeNode *root)
+    {
+        vector<int> result;
+        if (root == nullptr)
+            return result;
+        else
+        {
+            inorderTraversalProcess(root, result);
+        }
+        return result;
+    }
+    void inorderTraversalProcess(TreeNode *t, vector<int> &v)
+    {
+        if (t == nullptr)
+            return;
+        inorderTraversalProcess(t->left, v);
+        v.push_back(t->val);
+        inorderTraversalProcess(t->right, v);
+    }
+    /**
+     * @name: 95.不同的二叉搜索树 II
+     * @msg: 给定一个整数 n，生成所有由 1 ... n 为节点所组成的二叉搜索树。
+     * @param {type} 
+     * @return: 
+     */    
+    vector<TreeNode *> generateTrees(int n)
+    {
+        if(n==0) return vector<TreeNode*>(0);
+        return generateTrees(1, n);
+    }
+    vector<TreeNode *> generateTrees(int start, int end)
+    {
+        vector<TreeNode*> result;
+        if(start > end){
+            result.push_back(nullptr);
+            return result;
+        }
+        for(int i = start; i<=end; i++)
+        {
+            vector<TreeNode*> lefts = generateTrees(start, i-1);
+            vector<TreeNode*> rights = generateTrees(i+1, end);
+            for (int j = 0; j < lefts.size(); j++)
+            {
+                for (int k = 0; k < rights.size(); k++)
+                {
+                    TreeNode* root = new TreeNode(i);
+                    root->left = lefts[j];
+                    root->right = rights[k];
+                    result.push_back(root);
+                }
+                
+            }
+        }
+        return result;
+    }
+    /**
+     * @name: 98.验证二叉搜索树
+     * @msg: 给定一个二叉树，判断其是否是一个有效的二叉搜索树。
+     */
+    bool isValidBST(TreeNode *root)
+    {
+        list<int> elements;
+        if (!root)
+            return true;
+        inorderTraversal(root, elements);
+        int element;
+        while (!elements.empty())
+        {
+            element = elements.front();
+            elements.pop_front();
+            if (elements.empty())
+                return true;
+            else if (element < elements.front())
+                continue;
+            else
+                return false;
+        }
+        return true;
+    }
+    // 中序遍历 重载
+    void inorderTraversal(TreeNode *root, list<int> &l)
+    {
+        if (root == nullptr)
+            return;
+        else
+        {
+            inorderTraversal(root->left, l);
+            l.push_back(root->val);
+            inorderTraversal(root->right, l);
+        }
+    }
+    /**
      * @name: 102.二叉树的层次遍历
      * @msg: 给定一个二叉树，返回其按层次遍历的节点值。 （即逐层地，从左到右访问所有节点）
-     */    
-    vector<vector<int>> levelOrder(TreeNode* root) {
+     */
+    vector<vector<int>> levelOrder(TreeNode *root)
+    {
         vector<vector<int>> result;
-        if (!root) return result;
-        int depth = maxDepth(root);
-        
+        queue<TreeNode *> current, next;
+        if (!root)
+            return result;
+        current.push(root);
+        while (!current.empty())
+        {
+            vector<int> level;
+            while (!current.empty())
+            {
+                level.push_back(current.front()->val);
+                if (current.front()->left)
+                    next.push(current.front()->left);
+                if (current.front()->right)
+                    next.push(current.front()->right);
+                current.pop();
+            }
+            result.push_back(level);
+            swap(next, current);
+        }
+        return result;
     }
     /**
      * @name: 104.二叉树的最大深度
      * @msg: 给定一个二叉树，找出其最大深度。
      * 二叉树的深度为根节点到最远叶子节点的最长路径上的节点数。
      * 说明: 叶子节点是指没有子节点的节点。
-     */    
-    int maxDepth(TreeNode* root) {
-        if(!root) return 0;
-        if(!root->left && !root->right) return 1;
-        
-        return max(maxDepth(root->left), maxDepth(root->right))+1;
+     */
+    int maxDepth(TreeNode *root)
+    {
+        if (!root)
+            return 0;
+        if (!root->left && !root->right)
+            return 1;
+
+        return max(maxDepth(root->left), maxDepth(root->right)) + 1;
+    }
+    /**
+     * @name: 107.二叉树的层次遍历 II [相关102]
+     * @msg: 给定一个二叉树，返回其节点值自底向上的层次遍历。 （即按从叶子节点所在层到根节点所在的层，逐层从左向右遍历）
+     */
+    vector<vector<int>> levelOrderBottom(TreeNode *root)
+    {
+        vector<vector<int>> result = levelOrder(root);
+        reverse(result.begin(), result.end());
+        return result;
+    }
+    /**
+     * @name: 108.将有序数组转换为二叉搜索树
+     * @msg: 将一个按照升序排列的有序数组，转换为一棵高度平衡二叉搜索树。
+     */
+    TreeNode* sortedArrayToBST(vector<int>& nums) {
+        return sortedArrayToBST(nums, 0, nums.size());
+    }
+    TreeNode* sortedArrayToBST(vector<int>& nums, int start, int end){
+        if(end<=start) return NULL; 
+        int mixIndex = (start+end)/2;
+        TreeNode* root = new TreeNode(nums[mixIndex]);
+        root->left = sortedArrayToBST(nums, start, mixIndex);
+        root->right = sortedArrayToBST(nums, mixIndex+1, end);
+        return root;
     }
     /**
      * @name: 110.平衡二叉树
      * @msg: 给定一个二叉树，判断它是否是高度平衡的二叉树。
      */
-    
     bool isBalanced(TreeNode *root)
     {
         return process(root) != -1;
@@ -381,6 +523,47 @@ public:
             return -1;
 
         return max(left_subtree_height, right_subtree_height) + 1;
+    }
+    /**
+     * @name: 111.二叉树的最小深度
+     * @msg: 给定一个二叉树，找出其最小深度。
+     * 最小深度是从根节点到最近叶子节点的最短路径上的节点数量。
+     * 说明: 叶子节点是指没有子节点的节点。
+     * @param {type} 
+     * @return: 
+     */
+    int minDepth(TreeNode *root)
+    {
+        if (!root)
+            return 0;
+        int L = minDepth(root->left), R = minDepth(root->right);
+        return 1 + (min(L, R) ? min(L, R) : max(L, R));
+    }
+    /**
+     * @name: 199.二叉树的右视图
+     * @msg: 给定一棵二叉树，想象自己站在它的右侧，按照从顶部到底部的顺序，返回从右侧所能看到的节点值。
+     */
+    vector<int> rightSideView(TreeNode *root)
+    {
+       queue<TreeNode*> current, next;
+        vector<int> result;
+        if (!root) return result;
+        current.push(root);
+        while(!current.empty()) {
+            vector<int> level;
+            while(!current.empty()){
+                TreeNode *tn=current.front();
+                current.pop();
+                if (tn->left) next.push(tn->left);
+                if (tn->right) next.push(tn->right);
+                level.push_back(tn->val);
+                
+            }
+            result.push_back(level.back());
+            swap(current,next);
+            // level.clear();
+        }
+        return result;
     }
     /**
      * @name: 224. 基本计算器

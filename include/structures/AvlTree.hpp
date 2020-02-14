@@ -4,7 +4,7 @@
  * @Author: shadow3zz-zhouchenghao@whut.edu.cn
  * @Date: 2020-02-09 16:36:48
  * @LastEditors  : shadow3zz
- * @LastEditTime : 2020-02-11 00:17:12
+ * @LastEditTime : 2020-02-11 13:01:59
  */
 #pragma once
 #include <iostream>
@@ -177,7 +177,7 @@ private:
             remove(x, t->right);
         else if (!t->left && !t->right)
         {
-            t->element = findMin(t->right);
+            t->element = findMin(t->right)->element;
             remove(t->element, t->right);
         }
         else{
@@ -185,6 +185,7 @@ private:
             t = (!t->right)?t->left:t->right;
             delete oldNode;
         }
+        balance(t);
     }
 
     AvlNode *clone(AvlNode *t) const

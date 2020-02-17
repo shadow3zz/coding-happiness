@@ -3,8 +3,8 @@
  * @version: WSL:Ubuntu-16.04
  * @Author: shadow3zz-zhouchenghao@whut.edu.cn
  * @Date: 2020-01-31 21:49:23
- * @LastEditors  : shadow3zz
- * @LastEditTime : 2020-02-14 23:42:39
+ * @LastEditors: shadow3zz
+ * @LastEditTime : 2020-02-15 13:27:00
  */
 
 #pragma once
@@ -393,6 +393,20 @@ public:
         return result;
     }
     /**
+     * @name: 96.不同的二叉搜索树
+     * @msg: 给定一个整数 n，求以 1 ... n 为节点组成的二叉搜索树有多少种？
+     * h(n)=h(n-1)*(4*n-2)/(n+1);
+     */    
+    int numTrees(int n) {
+         if (n == 0) return 1;
+         long c = 1;
+         for (int i = 1; i <= n; i++)
+         {
+             c = c*(4*i-2)/(i+1);
+         }
+         return c;
+    }
+    /**
      * @name: 98.验证二叉搜索树
      * @msg: 给定一个二叉树，判断其是否是一个有效的二叉搜索树。
      */
@@ -428,6 +442,59 @@ public:
             inorderTraversal(root->right, l);
         }
     }
+    /**
+     * @name: 99.恢复二叉搜索树
+     * @msg: 二叉搜索树中的两个节点被错误地交换。
+     * 请在不改变其结构的情况下，恢复这棵树。
+     */    
+    void recoverTree(TreeNode* root) {
+        //中序遍历
+        list<TreeNode*> elements;
+        if (!root)
+            return ;
+        inorderTraversal(root, elements);
+        
+    }
+    // 中序遍历 重载
+    void inorderTraversal(TreeNode *root, list<TreeNode*> &l)
+    {
+        if (root == nullptr)
+            return;
+        else
+        {
+            inorderTraversal(root->left, l);
+            
+            if (root->val < l.back()->val){
+                int temp = l.back()->val;
+                l.back()->val = root->val;
+                root->val = temp;
+            }
+            l.push_back(root);
+            inorderTraversal(root->right, l);
+        }
+    }
+    /**
+     * @name: 101.对称二叉树
+     * @msg:  给定一个二叉树，检查它是否是镜像对称的。
+     * @param {type} 首先分析下这个对称二叉树，也就是一个二叉树中间对称。所以我们可以使用递归的思想，首先以根节点以及其左右子树，左子树的左子树和右子树的右子树相同，左子树的右子树和右子树的左子树相同。
+     * @return: 
+     */    
+    bool isSymmetric(TreeNode *root)
+    {
+        if (!root)
+            return true;
+        return checkSymmetric(root->left, root->right);
+    }
+    bool checkSymmetric(TreeNode *leftSymmetricNode, TreeNode *rightSymmetricNode)
+    {
+        if (!leftSymmetricNode && !rightSymmetricNode)
+            return true;
+        if (!leftSymmetricNode || !rightSymmetricNode)
+            return false;
+        if (leftSymmetricNode->val == rightSymmetricNode->val)
+            return checkSymmetric(leftSymmetricNode->left, rightSymmetricNode->right) && checkSymmetric(leftSymmetricNode->right, rightSymmetricNode->left);
+        return false;
+   }
     /**
      * @name: 102.二叉树的层次遍历
      * @msg: 给定一个二叉树，返回其按层次遍历的节点值。 （即逐层地，从左到右访问所有节点）
@@ -538,6 +605,29 @@ public:
             return 0;
         int L = minDepth(root->left), R = minDepth(root->right);
         return 1 + (min(L, R) ? min(L, R) : max(L, R));
+    }
+    /**
+     * @name: 112.路径总和
+     * @msg: 
+     * @param {type} 
+     * @return: 
+     */    
+    bool hasPathSum(TreeNode* root, int sum) {
+        if (!root) return false;
+        return checkPathSum(root, sum, 0);
+    }
+    bool checkPathSum(TreeNode* root, int sum, int result){
+        if (!root) return false;
+        if (!root->left && !root->right){
+            result += root->val;
+            if (sum == result) return true;
+            else return false;
+        } 
+        else{
+            result += root->val;
+            return checkPathSum(root->left, sum, result)||checkPathSum(root->right, sum, result);
+        }
+    
     }
     /**
      * @name: 199.二叉树的右视图

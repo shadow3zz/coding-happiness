@@ -3,8 +3,8 @@
  * @version: WSL:Ubuntu-16.04
  * @Author: shadow3zz-zhouchenghao@whut.edu.cn
  * @Date: 2020-01-30 13:35:17
- * @LastEditors  : shadow3zz
- * @LastEditTime : 2020-02-11 00:17:44
+ * @LastEditors: shadow3zz
+ * @LastEditTime: 2020-02-21 23:16:11
  */
 #include <iostream>
 #include <stdlib.h>
@@ -35,8 +35,8 @@ int main(int argc, char const *argv[])
     // example_vector();
     // example_list();
     // example_stack();
-    exmaple_avltree();
-    // leetcode_test();
+    // exmaple_avltree();
+    leetcode_test();
     // book_exec();
     system("pause");
     return 0;
@@ -115,6 +115,7 @@ void leetcode_test()
 {
     Solution s;
 #if 0
+
     // 8
     std::string str_num = "-2147483646";
     std::cout << s.myAtoi(str_num) << std::endl; 
@@ -135,7 +136,11 @@ void leetcode_test()
     //1041
     s.isRobotBounded("GGRGGRGGRGGR");
 #else
-
+    //2
+    Solution::ListNode *test_1 = new Solution::ListNode(4);
+    Solution::ListNode *test_2 = new Solution::ListNode(9);
+    Solution::ListNode *result = s.addTwoNumbers(test_1, test_2);
+    
 #endif
 }
 

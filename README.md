@@ -66,7 +66,7 @@
 ## 遗留问题
 
     如何配置调试？
-
+    
     需要将wxWidgets编译安装，并做到第三方引用。
 
 # 使用 Visual Studio Code 搭建 C/C++ 开发和调试环境
@@ -281,7 +281,7 @@
 ①安装wxWidgets3.0.1[csdn](https://blog.csdn.net/qq_32768743/article/details/83220719)或者[opencpn](https://opencpn.org/wiki/dokuwiki/doku.php?id=opencpn:developer_manual:developer_guide:compiling_linux)
 
     `sudo apt install libwxgtk3.0-dev`  (csdn)
-
+    
     `sudo apt-get install build-essential cmake gettext git-core gpsd gpsd-clients libgps-dev wx-common libwxgtk3.0-dev libglu1-mesa-dev libgtk2.0-dev wx3.0-headers libbz2-dev libtinyxml-dev libportaudio2 portaudio19-dev libcurl4-openssl-dev libexpat1-dev libcairo2-dev libarchive-dev liblzma-dev libexif-dev libelf-dev libsqlite3-dev`   (opencpn)
 
 ②安装wxWidgets3.1.2[codelite](https://wiki.codelite.org/pmwiki.php/Main/WxWidgets312Binaries)
@@ -390,7 +390,7 @@ std::string newPrint(std::string str)
 ## 遗留问题：
 
     多线程相关知识
-
+    
     wxwidgets在vscode中的使用问题 [wxWidgets and VSCode](http://wxwidgets.10942.n7.nabble.com/wxWidgets-and-VSCode-td93506.html)
 
 ## 安装wxWidgets
@@ -444,5 +444,6 @@ sudo apt-get install build-essential cmake gettext git-core gpsd gpsd-clients li
     添加头文件测试\#include <wx/wx.h> 
 
         wxString msg(wxT("ready!"));
-
+    
         std::cout << "测试wxwidgets：" << msg.mb_str() << std::endl;
+

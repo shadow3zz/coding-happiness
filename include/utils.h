@@ -4,7 +4,7 @@
  * @Author: shadow3zz-zhouchenghao@whut.edu.cn
  * @Date: 2020-01-31 21:49:23
  * @LastEditors: shadow3zz
- * @LastEditTime : 2020-02-15 13:27:00
+ * @LastEditTime: 2020-02-21 23:59:58
  */
 
 #pragma once
@@ -26,6 +26,42 @@ class Solution
 {
 private:
 public:
+    struct ListNode
+    {
+        int val;
+        ListNode *next;
+        ListNode(int x) : val(x), next(NULL) {}
+    };
+    /**
+     * @name: 2.两数相加
+     * @msg: 给出两个 非空 的链表用来表示两个非负的整数。其中，它们各自的位数是按照 逆序 的方式存储的，并且它们的每个节点只能存储 一位 数字。
+     * 如果，我们将这两个数相加起来，则会返回一个新的链表来表示它们的和。
+     * 您可以假设除了数字 0 之外，这两个数都不会以 0 开头。
+     */
+    ListNode *addTwoNumbers(ListNode *l1, ListNode *l2)
+    {
+        ListNode *start = new ListNode(0);
+        ListNode *result = start;
+        ListNode *pNode_1 = l1;
+        ListNode *pNode_2 = l2;
+        int flag = 0;
+        while (pNode_1 || pNode_2)
+        {
+            int temp = (pNode_1 ? pNode_1->val : 0) + (pNode_2 ? pNode_2->val : 0) + flag;
+            result = result->next = new ListNode(temp%10);
+            flag = temp/10;
+            if (pNode_1)
+                pNode_1 = pNode_1->next;
+            if (pNode_2)
+                pNode_2 = pNode_2->next;                
+        }
+        if (flag == 1)
+        {
+            result->next = new ListNode(1);
+        }
+        return start->next;
+    }
+
     /**
      * @name: 8. 字符串转换整数 (atoi)
      * @msg: 请你来实现一个 atoi 函数，使其能将字符串转换成整数。
@@ -184,12 +220,7 @@ public:
      * 输入：1->2->4, 1->3->4
      * 输出：1->1->2->3->4->4
      */
-    struct ListNode
-    {
-        int val;
-        ListNode *next;
-        ListNode(int x) : val(x), next(NULL) {}
-    };
+
     ListNode *mergeTwoLists(ListNode *l1, ListNode *l2)
     {
         if (l1 == nullptr)
@@ -361,33 +392,34 @@ public:
      * @msg: 给定一个整数 n，生成所有由 1 ... n 为节点所组成的二叉搜索树。
      * @param {type} 
      * @return: 
-     */    
+     */
     vector<TreeNode *> generateTrees(int n)
     {
-        if(n==0) return vector<TreeNode*>(0);
+        if (n == 0)
+            return vector<TreeNode *>(0);
         return generateTrees(1, n);
     }
     vector<TreeNode *> generateTrees(int start, int end)
     {
-        vector<TreeNode*> result;
-        if(start > end){
+        vector<TreeNode *> result;
+        if (start > end)
+        {
             result.push_back(nullptr);
             return result;
         }
-        for(int i = start; i<=end; i++)
+        for (int i = start; i <= end; i++)
         {
-            vector<TreeNode*> lefts = generateTrees(start, i-1);
-            vector<TreeNode*> rights = generateTrees(i+1, end);
+            vector<TreeNode *> lefts = generateTrees(start, i - 1);
+            vector<TreeNode *> rights = generateTrees(i + 1, end);
             for (int j = 0; j < lefts.size(); j++)
             {
                 for (int k = 0; k < rights.size(); k++)
                 {
-                    TreeNode* root = new TreeNode(i);
+                    TreeNode *root = new TreeNode(i);
                     root->left = lefts[j];
                     root->right = rights[k];
                     result.push_back(root);
                 }
-                
             }
         }
         return result;
@@ -396,15 +428,17 @@ public:
      * @name: 96.不同的二叉搜索树
      * @msg: 给定一个整数 n，求以 1 ... n 为节点组成的二叉搜索树有多少种？
      * h(n)=h(n-1)*(4*n-2)/(n+1);
-     */    
-    int numTrees(int n) {
-         if (n == 0) return 1;
-         long c = 1;
-         for (int i = 1; i <= n; i++)
-         {
-             c = c*(4*i-2)/(i+1);
-         }
-         return c;
+     */
+    int numTrees(int n)
+    {
+        if (n == 0)
+            return 1;
+        long c = 1;
+        for (int i = 1; i <= n; i++)
+        {
+            c = c * (4 * i - 2) / (i + 1);
+        }
+        return c;
     }
     /**
      * @name: 98.验证二叉搜索树
@@ -446,25 +480,48 @@ public:
      * @name: 99.恢复二叉搜索树
      * @msg: 二叉搜索树中的两个节点被错误地交换。
      * 请在不改变其结构的情况下，恢复这棵树。
-     */    
-    void recoverTree(TreeNode* root) {
-        //中序遍历
-        list<TreeNode*> elements;
+     */
+    void recoverTree(TreeNode *root)
+    {
         if (!root)
-            return ;
-        inorderTraversal(root, elements);
-        
+            return;
+        //中序遍历
+        vector<int> in_1;
+        recoverTreeHelper(root, in_1);
+        sort(in_1.begin(), in_1.end());
+        recoverTreeHelper_(root, in_1);
+    }
+    void recoverTreeHelper(TreeNode *root, vector<int> &in)
+    {
+        if (!root)
+            return;
+        recoverTreeHelper(root->left, in);
+        in.push_back(root->val);
+        recoverTreeHelper(root->right, in);
+    }
+    void recoverTreeHelper_(TreeNode *root, vector<int> &in)
+    {
+        if (!root)
+            return;
+        recoverTreeHelper_(root->left, in);
+        if (in[0] != root->val)
+        {
+            root->val = in.front();
+        }
+        in.erase(in.begin());
+        recoverTreeHelper_(root->right, in);
     }
     // 中序遍历 重载
-    void inorderTraversal(TreeNode *root, list<TreeNode*> &l)
+    void inorderTraversal(TreeNode *root, list<TreeNode *> &l)
     {
         if (root == nullptr)
             return;
         else
         {
             inorderTraversal(root->left, l);
-            
-            if (root->val < l.back()->val){
+
+            if (root->val < l.back()->val)
+            {
                 int temp = l.back()->val;
                 l.back()->val = root->val;
                 root->val = temp;
@@ -478,7 +535,7 @@ public:
      * @msg:  给定一个二叉树，检查它是否是镜像对称的。
      * @param {type} 首先分析下这个对称二叉树，也就是一个二叉树中间对称。所以我们可以使用递归的思想，首先以根节点以及其左右子树，左子树的左子树和右子树的右子树相同，左子树的右子树和右子树的左子树相同。
      * @return: 
-     */    
+     */
     bool isSymmetric(TreeNode *root)
     {
         if (!root)
@@ -494,7 +551,7 @@ public:
         if (leftSymmetricNode->val == rightSymmetricNode->val)
             return checkSymmetric(leftSymmetricNode->left, rightSymmetricNode->right) && checkSymmetric(leftSymmetricNode->right, rightSymmetricNode->left);
         return false;
-   }
+    }
     /**
      * @name: 102.二叉树的层次遍历
      * @msg: 给定一个二叉树，返回其按层次遍历的节点值。 （即逐层地，从左到右访问所有节点）
@@ -518,6 +575,38 @@ public:
                     next.push(current.front()->right);
                 current.pop();
             }
+            result.push_back(level);
+            swap(next, current);
+        }
+        return result;
+    }
+    /**
+     * @name: 103.二叉树的锯齿形层次遍历
+     * @msg: 给定一个二叉树，返回其节点值的锯齿形层次遍历。（即先从左往右，再从右往左进行下一层遍历，以此类推，层与层之间交替进行）。
+     */
+    vector<vector<int>> zigzagLevelOrder(TreeNode *root)
+    {
+        vector<vector<int>> result;
+        bool flag = false;
+        queue<TreeNode *> current, next;
+        if (!root)
+            return result;
+        current.push(root);
+        while (!current.empty())
+        {
+            vector<int> level;
+            while (!current.empty())
+            {
+                level.push_back(current.front()->val);
+                if (current.front()->left)
+                    next.push(current.front()->left);
+                if (current.front()->right)
+                    next.push(current.front()->right);
+                current.pop();
+            }
+            if (flag)
+                reverse(level.begin(), level.end());
+            flag = !flag;
             result.push_back(level);
             swap(next, current);
         }
@@ -552,15 +641,18 @@ public:
      * @name: 108.将有序数组转换为二叉搜索树
      * @msg: 将一个按照升序排列的有序数组，转换为一棵高度平衡二叉搜索树。
      */
-    TreeNode* sortedArrayToBST(vector<int>& nums) {
+    TreeNode *sortedArrayToBST(vector<int> &nums)
+    {
         return sortedArrayToBST(nums, 0, nums.size());
     }
-    TreeNode* sortedArrayToBST(vector<int>& nums, int start, int end){
-        if(end<=start) return NULL; 
-        int mixIndex = (start+end)/2;
-        TreeNode* root = new TreeNode(nums[mixIndex]);
+    TreeNode *sortedArrayToBST(vector<int> &nums, int start, int end)
+    {
+        if (end <= start)
+            return NULL;
+        int mixIndex = (start + end) / 2;
+        TreeNode *root = new TreeNode(nums[mixIndex]);
         root->left = sortedArrayToBST(nums, start, mixIndex);
-        root->right = sortedArrayToBST(nums, mixIndex+1, end);
+        root->right = sortedArrayToBST(nums, mixIndex + 1, end);
         return root;
     }
     /**
@@ -611,23 +703,30 @@ public:
      * @msg: 
      * @param {type} 
      * @return: 
-     */    
-    bool hasPathSum(TreeNode* root, int sum) {
-        if (!root) return false;
+     */
+    bool hasPathSum(TreeNode *root, int sum)
+    {
+        if (!root)
+            return false;
         return checkPathSum(root, sum, 0);
     }
-    bool checkPathSum(TreeNode* root, int sum, int result){
-        if (!root) return false;
-        if (!root->left && !root->right){
+    bool checkPathSum(TreeNode *root, int sum, int result)
+    {
+        if (!root)
+            return false;
+        if (!root->left && !root->right)
+        {
             result += root->val;
-            if (sum == result) return true;
-            else return false;
-        } 
-        else{
-            result += root->val;
-            return checkPathSum(root->left, sum, result)||checkPathSum(root->right, sum, result);
+            if (sum == result)
+                return true;
+            else
+                return false;
         }
-    
+        else
+        {
+            result += root->val;
+            return checkPathSum(root->left, sum, result) || checkPathSum(root->right, sum, result);
+        }
     }
     /**
      * @name: 199.二叉树的右视图
@@ -635,22 +734,26 @@ public:
      */
     vector<int> rightSideView(TreeNode *root)
     {
-       queue<TreeNode*> current, next;
+        queue<TreeNode *> current, next;
         vector<int> result;
-        if (!root) return result;
+        if (!root)
+            return result;
         current.push(root);
-        while(!current.empty()) {
+        while (!current.empty())
+        {
             vector<int> level;
-            while(!current.empty()){
-                TreeNode *tn=current.front();
+            while (!current.empty())
+            {
+                TreeNode *tn = current.front();
                 current.pop();
-                if (tn->left) next.push(tn->left);
-                if (tn->right) next.push(tn->right);
+                if (tn->left)
+                    next.push(tn->left);
+                if (tn->right)
+                    next.push(tn->right);
                 level.push_back(tn->val);
-                
             }
             result.push_back(level.back());
-            swap(current,next);
+            swap(current, next);
             // level.clear();
         }
         return result;
@@ -757,7 +860,95 @@ public:
             return (rear + 1) % maxSize == front;
         }
     };
+    /**
+     * @name: 735.行星碰撞
+     * 对于数组中的每一个元素，其绝对值表示行星的大小，正负表示行星的移动方向（正表示向右移动，负表示向左移动）。每一颗行星以相同的速度移动。
+     * 找出碰撞后剩下的所有行星。碰撞规则：两个行星相互碰撞，较小的行星会爆炸。如果两颗行星大小相同，则两颗行星都会爆炸。两颗移动方向相同的行星，永远不会发生碰撞。
+     */
+    vector<int> asteroidCollision(vector<int> &asteroids)
+    {
+        stack<int> stk;
+        stack<int> stk_;
+        vector<int> result;
+        for (int star : asteroids)
+        {
+            if (stk.empty())
+                stk.push(star);
+            else
+            {
+                int temp = stk.top();
+                if (temp < 0) //栈顶为负数
+                {
+                    stk.push(star);
+                    continue;
+                }
+                else //栈顶为正数
+                {
+                    if (star > 0) //目标为正数，直接入栈
+                    {
+                        stk.push(star);
+                        continue;
+                    }
+                    else // 目标为负数，需要比较
+                    {
+                        int sum = temp + star;
+                        if (sum > 0) //栈顶>目标，栈不变
+                            continue;
+                        else if (sum == 0) //栈顶==目标，栈顶弹出
+                        {
+                            stk.pop();
+                            continue;
+                        }
+                        else
+                        //栈顶<目标，栈顶弹出，检测栈顶是否仍旧小于目标，
+                        //如果是继续弹出，直到栈顶大于目标或者栈为空或者
+                        //栈顶为负数或者栈顶和目标相等
+                        {
+                            stk.pop();
+                            while (!stk.empty())
+                            {
+                                if (stk.top() > 0 && stk.top() + star < 0)
+                                    stk.pop();
+                                else
+                                    break;
+                            }
+                            if (stk.empty())
+                            {
+                                stk.push(star);
+                                continue;
+                            }
+                            else if (stk.top() + star == 0)
+                            {
+                                stk.pop();
+                                continue;
+                            }
+                            else if (stk.top() + star > 0)
+                            {
+                                continue;
+                            }
+                            else if (stk.top() < 0 || stk.empty())
+                            {
+                                stk.push(star);
+                                continue;
+                            }
+                        }
+                    }
+                }
+            }
+        }
 
+        while (!stk.empty())
+        {
+            stk_.push(stk.top());
+            stk.pop();
+        }
+        while (!stk_.empty())
+        {
+            result.push_back(stk_.top());
+            stk_.pop();
+        }
+        return result;
+    }
     /**
      * @name: 1041. 困于环中的机器人
      * @msg: 在无限的平面上，机器人最初位于 (0, 0) 处，面朝北方。机器人可以接受下列三条指令之一：
@@ -800,5 +991,41 @@ public:
             return false;
         else
             return true;
+    }
+    /**
+     * @name: 二维网格迁移
+     * 给你一个 m 行 n 列的二维网格 grid 和一个整数 k。你需要将 grid 迁移 k 次。
+     * 每次「迁移」操作将会引发下述活动：
+     *  位于 grid[i][j] 的元素将会移动到 grid[i][j + 1]。
+     *  位于 grid[i][n - 1] 的元素将会移动到 grid[i + 1][0]。
+     *  位于 grid[m - 1][n - 1] 的元素将会移动到 grid[0][0]。
+     * 请你返回 k 次迁移操作后最终得到的 二维网格。
+     */
+    vector<vector<int>> shiftGrid(vector<vector<int>> &grid, int k)
+    {
+        int m, n;
+        m = grid.size();
+        n = grid[0].size();
+        if (m == 0)
+            return grid;
+        for (; k > 0; k--)
+        {
+            vector<int> last_line;
+            last_line.push_back(0);
+            for (int i = 0; i < m; i++)
+            {
+                last_line.push_back(grid[i][n - 1]);
+            }
+            for (int j = 0; j < m; j++)
+            {
+                for (int l = n - 1; l > 0; l--)
+                {
+                    grid[j][l] = grid[j][l - 1];
+                }
+                grid[j][0] = last_line[j];
+            }
+            grid[0][0] = last_line.back();
+        }
+        return grid;
     }
 };

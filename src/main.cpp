@@ -4,20 +4,26 @@
  * @Author: shadow3zz-zhouchenghao@whut.edu.cn
  * @Date: 2020-01-30 13:35:17
  * @LastEditors: shadow3zz
- * @LastEditTime: 2020-02-21 23:16:11
+ * @LastEditTime: 2020-06-15 22:56:12
  */
 #include <iostream>
+#include <sstream>
+#include <cmath>
 #include <stdlib.h>
 #include <cstring>
+#include <map>
+#include <memory>
+
 // #include <wx/wx.h>
 #include "Vector.h"
 #include "List.h"
 #include "Stack.h"
 #include "AvlTree.hpp"
 #include "utils.h"
+#include "sort.h"
+#include "jzoffer.hpp"
+#include "List.h"
 
-int a = 1, b = 2, c = 3, d = 4;
-double e = 1.1, f = 2.21;
 char *str[] = {"aaa", "aab", "aac", "zhouzhou", "yiyi"};
 
 void example_vector();
@@ -26,17 +32,71 @@ void example_stack();
 void exmaple_avltree();
 void leetcode_test();
 void book_exec();
+void sort_test();
 
 int main(int argc, char const *argv[])
-{
-    std::cout << "数据结构与算法分析 C++描述" << std::endl;
-    // wxString msg(wxT("ready!"));
-    // std::cout << "测试wxwidgets：" << msg.mb_str() << std::endl;
+{   
+    #if 0
+    std::vector<int> input_1 = {1,2,4,2,3,3,4,5};
+    duplicate::duplicate_1(input_1, 8);
+    duplicate::duplicate_2(input_1, 8);
+    duplicate::duplicate_3(input_1, 8);
+    int cc = duplicate::duplicate_4(input_1, 7);
+
+    std::vector<std::vector<int> > input2 = {{1, 2, 8, 9}, {2, 4, 9, 12}, {4, 7, 10, 13}, {6, 8, 11, 15}};
+    bool result = Find::Find(input2, 16);
+
+    std::string input3 = "   ";
+    ReplaceBlank::ReplaceBlank(input3);
+
+    ListNode* pNode1 = CreateListNode(1);
+    ListNode* pNode2 = CreateListNode(2);
+    ListNode* pNode3 = CreateListNode(3);
+    ListNode* pNode4 = CreateListNode(4);
+    ListNode* pNode5 = CreateListNode(5);
+    ConnectListNodes(pNode1, pNode2);
+    ConnectListNodes(pNode2, pNode3);
+    ConnectListNodes(pNode3, pNode4);
+    ConnectListNodes(pNode4, pNode5);
+    PrintListReversing_Iteratively::PrintList_Reversing_Iteratively_2(pNode1);
+    
+    BinaryTreeNode* pNode8 = CreateBinaryTreeNode(8);
+    BinaryTreeNode* pNode6 = CreateBinaryTreeNode(6);
+    BinaryTreeNode* pNode10 = CreateBinaryTreeNode(10);
+    BinaryTreeNode* pNode5 = CreateBinaryTreeNode(5);
+    BinaryTreeNode* pNode7 = CreateBinaryTreeNode(7);
+    BinaryTreeNode* pNode9 = CreateBinaryTreeNode(9);
+    BinaryTreeNode* pNode11 = CreateBinaryTreeNode(11);
+    ConnectBinaryTreeNode(pNode8, pNode6, pNode10);
+    ConnectBinaryTreeNode(pNode6, pNode5, pNode7);
+    ConnectBinaryTreeNode(pNode10, pNode9, pNode11);
+    BinaryTreeNode* pNext = NextNodeInBinaryTrees::GetNext(pNode7);
+    
+    int Fibonacci_result_n = Fibonacci::Fibonacci(8);
+        
+    std::vector<int> array1 = {  3, 4, 5, 1, 1, 2};
+    std::vector<int> array2 = {3, 4, 5, 1, 2, 2 };
+    std::vector<int> array3 = { 1};
+    int array1_result = MinNumberInRotatedArray::findMinInRotatedArray_2(array1);
+    int array2_result = MinNumberInRotatedArray::findMinInRotatedArray_2(array2);
+    int array3_result = MinNumberInRotatedArray::findMinInRotatedArray_2(array3);
+
+    std::vector<std::vector< char>> matrix = {{'A','B','T','G'},{'C','F','C','S'},{'J','D','E','H'}};
+    std::string str = "BFCE";
+    bool StringPathInMatrixResult = StringPathInMatrix::StringPathInMatrix(matrix, str);
+    StringPathInMatrix::Permutation(3);
+    
+    #else
+    cout  << RobotMove::RobotMove(10, 10, 5) << endl;
+
+    
+    #endif
     // example_vector();
     // example_list();
     // example_stack();
     // exmaple_avltree();
     leetcode_test();
+    // sort_test();
     // book_exec();
     system("pause");
     return 0;
@@ -44,6 +104,9 @@ int main(int argc, char const *argv[])
 
 void example_vector()
 {
+    int a = 1, b = 2, c = 3, d = 4;
+    double e = 1.1, f = 2.21;
+    char *str[] = {"aaa", "aab", "aac", "zhouzhou", "yiyi"};
     // Vector用例
     Vector<int> v_int;
     v_int.push_back(a);
@@ -73,6 +136,9 @@ void example_vector()
 
 void example_list()
 {
+    int a = 1, b = 2, c = 3, d = 4;
+    double e = 1.1, f = 2.21;
+    
     List<char *> l_char;
     for (int i = 0; i < sizeof(str)/sizeof(char*); i++)
     {
@@ -88,6 +154,9 @@ void example_list()
 
 void example_stack()
 {
+    int a = 1, b = 2, c = 3, d = 4;
+    double e = 1.1, f = 2.21;
+    
     Stack<double> s_double;
     s_double.push(e);
     s_double.push(f);
@@ -135,13 +204,81 @@ void leetcode_test()
 
     //1041
     s.isRobotBounded("GGRGGRGGRGGR");
-#else
+
     //2
     Solution::ListNode *test_1 = new Solution::ListNode(4);
     Solution::ListNode *test_2 = new Solution::ListNode(9);
     Solution::ListNode *result = s.addTwoNumbers(test_1, test_2);
     
-#endif
+    //1013
+    vector<int> test = {3,3,6,5,-2,2,5,1,-9,4};
+    s.canThreePartsEqualSum(test);
+
+    //面试题 17.17. 多次搜索
+    string big = "mississippi";
+    vector<string> smalls = {"is","ppi","hi","sis","i","ssippi"};
+    s.multiSearch(big, smalls);   
+    //695
+    vector<vector<int> > grid;
+    //grid={{1,1,0,0,0},{1,1,0,0,0},{0,0,0,1,1},{0,0,0,1,1}};
+    grid={{1,1}};
+    s.maxAreaOfIsland(grid);
+
+    // 面试题 01.06
+    string a = "aaabbbcc";
+    s.compressString(a);
+
+    //179
+    vector<int> nums = {10, 0};
+    s.largestNumber(nums);
+
+    vector<string> words = {"cat","bt","hat","tree"};
+    string chars = "atach";
+    s.countCharacters(words, chars);
+
+    string a = "";
+    s.lengthOfLongestSubstring(a);
+  
+    //945
+    vector<int> A = {3,2,1,2,1,7};
+    s.minIncrementForUnique(A);
+
+    //105
+    vector<int> pre = {3,9,20,15,7};
+    vector<int> ino = {9,3,15,20,7};
+    s.buildTree2(pre, ino);
+    
+    //106
+    vector<int> post = {9,15,7,20,3};
+    vector<int> ino = {9,3,15,20,7};
+    s.buildTree1(ino, post);
+
+    vector<string> words = {"mass","as","hero","superhero"};
+    s.stringMatching(words);
+
+    vector<int> queries = {3,1,2,1};
+    int m =5;
+    s.processQueries(queries, m);
+
+    string text = "&amp; is an HTML entity but &ambassador; is not.";
+    s.entityParser(text);
+
+    vector<vector<char> > board = {{'a','b'}, {'c','d'}};
+    string word = "abcd";
+    s.exist(board ,word);
+
+    s.myPow(2.0, 9);
+
+    vector<vector<int>> intervals = {{4,5},{2,4},{4,6},{3,4},{0,0},{1,1},{3,5},{2,2}};  //[[4,5],[2,4],[4,6],[3,4],[0,0],[1,1],[3,5],[2,2]]
+    s.minMeetingRooms(intervals);
+ 
+    vector<vector<int>> obstacleGrid={{0,0,0},{0,1,0},{0,0,0}};
+    s.uniquePathsWithObstacles(obstacleGrid);
+
+     s.getPermutation(4, 7);
+#endif 
+
+
 }
 
 #include "exercises.hpp"
@@ -155,4 +292,9 @@ void book_exec()
     // exec_3_5();
     // std::cout << "习题3.6：";
     // exec_3_6();
+}
+
+void sort_test(){
+    vector<int> obj = {34,8,64,2,1,3,4,5,2,11,31};
+    insertionSort<int>(obj);
 }

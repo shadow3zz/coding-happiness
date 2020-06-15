@@ -4,7 +4,7 @@
  * @Author: shadow3zz-zhouchenghao@whut.edu.cn
  * @Date: 2020-01-31 21:49:23
  * @LastEditors: shadow3zz
- * @LastEditTime: 2020-02-21 23:59:58
+ * @LastEditTime: 2020-04-22 09:17:56
  */
 
 #pragma once
@@ -17,6 +17,8 @@
 #include <iterator>
 #include <algorithm>
 #include <cmath>
+#include <string>
+#include <map>
 
 #define INT_MAX 2147483648
 #define INT_MIN -2147483648
@@ -48,12 +50,12 @@ public:
         while (pNode_1 || pNode_2)
         {
             int temp = (pNode_1 ? pNode_1->val : 0) + (pNode_2 ? pNode_2->val : 0) + flag;
-            result = result->next = new ListNode(temp%10);
-            flag = temp/10;
+            result = result->next = new ListNode(temp % 10);
+            flag = temp / 10;
             if (pNode_1)
                 pNode_1 = pNode_1->next;
             if (pNode_2)
-                pNode_2 = pNode_2->next;                
+                pNode_2 = pNode_2->next;
         }
         if (flag == 1)
         {
@@ -61,7 +63,45 @@ public:
         }
         return start->next;
     }
-
+    /**
+     * @name: 3.无重复子字符串
+     * @msg: 
+     * @param {type} 
+     * @return: 
+     */    
+    int lengthOfLongestSubstring(string s) {
+        
+        if (s.size() == 0) return 0;
+        int max = 1;
+        
+        int a[128];int b[128];int c[128];
+        for (int i = 0 ;i<128;i++)
+        {
+            a[i] = 0;
+        }
+        memcpy(b,a,sizeof(a));
+        memcpy(c,a,sizeof(a));
+        int sub_len = 0;
+        for (int i = 0; i<s.size(); i++){
+            a[s[i]]+=1;
+            if(a[s[i]] == 2)
+            {
+                max = max>sub_len?max:sub_len;
+                sub_len = 0;
+                memcpy(a,b,sizeof(b));
+                i = c[s[i]];
+                memcpy(c,b,sizeof(b));
+            }   
+            else
+            {
+                sub_len++;
+                c[s[i]] = i;
+            }
+                
+        }
+        return max>sub_len?max:sub_len;
+    }
+    
     /**
      * @name: 8. 字符串转换整数 (atoi)
      * @msg: 请你来实现一个 atoi 函数，使其能将字符串转换成整数。
@@ -275,7 +315,7 @@ public:
     */
     int strStr(std::string haystack, std::string needle)
     {
-        haystack.find(needle);
+        //haystack.find(needle);
         if (!needle.empty())
         {
             int N = haystack.size() - needle.size() + 1;
@@ -356,6 +396,120 @@ public:
             }
         }
     }
+    /**
+     * @name: 43.43. 字符串相乘
+     * @msg: 给定两个以字符串形式表示的非负整数 num1 和 num2，返回 num1 和 num2 的乘积，它们的乘积也表示为字符串形式。
+     * @param {type} 
+     * @return: 
+     */
+    string multiply(string num1, string num2)
+    {
+        int num1_length = num1.size();
+        int num2_length = num2.size();
+        if (num1 == "0" || num2 == "0")
+            return "0";
+        vector<int> result(num1_length + num2_length, 0);
+
+        int mult_of_two_number;
+        for (int i = num2_length - 1; i >= 0; --i)
+        { //取第二个数字的每一位
+            int temp1 = num2[i] - '0';
+            for (int j = num1_length - 1; j >= 0; --j)
+            {
+                int temp2 = num1[j] - '0';
+                mult_of_two_number = temp1 * temp2;
+                mult_of_two_number += result[i + j + 1];
+                result[i + j] += mult_of_two_number / 10;
+                result[i + j + 1] = mult_of_two_number % 10;
+            }
+        }
+        auto it = result.begin();
+        while (*it == 0)
+        {
+            it++;
+        }
+        string new_result;
+        for (; it != result.end(); ++it)
+            new_result += *it + '0';
+        return new_result;
+    }
+    /**
+     * @name: 60 第k个排列
+     * @msg: 
+     * @param {type} 
+     * @return: 
+     */    
+    string getPermutation(int n, int k) {
+        
+        string res;
+        vector<int> nums;
+        for (int i = 1; i<=n; i++){
+            nums.push_back(i);
+        }
+        int i = 1;
+        while(!nums.empty()){
+            int count = countn(n-i);
+            i++;
+            int pos = k/count;
+            k %= count;
+            if(k==0){
+                if (pos!=0){
+                    res += to_string(nums[pos-1]);
+                    nums.erase(nums.begin()+pos-1);
+                }
+            }
+            else{
+                res += to_string(nums[pos-1]);
+                    nums.erase(nums.begin()+pos-1);
+            }
+        }
+        return res;
+    }
+    int countn(int n){
+        if (n == 1) return 1;
+        return n*countn(n-1);
+    }
+    /**
+     * @name: 63.不同路径2
+     * @msg: 
+     * @param {type} 
+     * @return: 
+     */    
+    int uniquePathsWithObstacles(vector<vector<int>>& obstacleGrid) {
+        int n = obstacleGrid.size();
+        int m = obstacleGrid[0].size();
+        vector<vector<int> > dp(n, vector<int>(m, -1));
+        for (int i = 0; i<n; ++i){
+            if (obstacleGrid[i][0]==0)
+                dp[i][0] = 1;
+            else
+                break;
+        }
+        for (int i = 0; i<m; ++i){
+            if (obstacleGrid[0][i]==0)
+                dp[0][i] = 1;
+            else
+                break;
+        }
+        for (int i = 1; i<n; ++i){
+            for (int j =1; j<m; ++j){
+                if (obstacleGrid[i][j]==0){
+                    if (dp[i-1][j]==-1||dp[i][j-1]==-1){
+                        if (dp[i-1][j]==-1&&dp[i][j-1]==-1)
+                            continue;
+                        else
+                            dp[i][j] = (dp[i-1][j]==-1?0:dp[i-1][j])+(dp[i][j-1]==-1?0:dp[i][j-1]);
+                    }
+                    else
+                        dp[i][j]=dp[i-1][j]+dp[i][j-1];
+                }
+                else
+                    continue;
+            }
+        }
+        return dp[n-1][m-1];
+    }
+
     // Tree
     struct TreeNode
     {
@@ -627,6 +781,49 @@ public:
 
         return max(maxDepth(root->left), maxDepth(root->right)) + 1;
     }
+    
+    /**
+     * @name: 105.从中序与后序遍历序列构造二叉树
+     * @msg: 
+     * @param {type} 
+     * @return: 
+     */    
+    TreeNode* buildTree1(const vector<int>& inorder, const vector<int>& postorder) {
+        if (postorder.size() > 0){
+            TreeNode *root = new TreeNode(0);
+            root->val = postorder[postorder.size()-1];
+            auto mid = find(inorder.begin(), inorder.end(), root->val);
+            int left2mid = distance(inorder.begin(), mid);
+            root->left = buildTree1(vector<int>(inorder.begin(), mid),vector<int>(postorder.begin(), postorder.begin()+left2mid));
+            root->right = buildTree1(vector<int>(mid+1, inorder.end()),vector<int>(postorder.begin()+left2mid, postorder.end()-1));
+            return root;
+        }
+        return NULL;
+    }
+    /**
+     * @name: 105.从前序与中序遍历序列构造二叉树
+     * @msg: 
+     * @param {type} 
+     * @return: 
+     */    
+    TreeNode* buildTree2(const vector<int>& preorder, const vector<int>& inorder) {
+        
+        if (preorder.size() > 0){
+            TreeNode *root = new TreeNode(0);
+            root->val = preorder[0];
+            //中序遍历中找到根结点迭代器
+            auto mid = find(inorder.begin(), inorder.end(), root->val);
+            int left2mid = distance(inorder.begin(), mid);
+            // 左子树()
+            root->left = buildTree2(vector<int>(preorder.begin()+1, preorder.begin()+1+left2mid), vector<int>(inorder.begin(), mid));
+            // 右子树
+            root->right = buildTree2(vector<int>(preorder.begin()+1+left2mid, preorder.end()), vector<int>(mid+1, inorder.end()));
+
+            return root;
+        }
+    
+        return NULL;
+    }
     /**
      * @name: 107.二叉树的层次遍历 II [相关102]
      * @msg: 给定一个二叉树，返回其节点值自底向上的层次遍历。 （即按从叶子节点所在层到根节点所在的层，逐层从左向右遍历）
@@ -729,6 +926,41 @@ public:
         }
     }
     /**
+     * @name: 179
+     * @msg: 
+     * @param {type} 
+     * @return: 
+     */    
+    string largestNumber(vector<int>& nums) {
+        if (nums.empty()) return "";
+        
+        vector<string> result;
+        int length;
+        for (auto s:nums){
+            result.push_back(to_string(s));
+        }
+        sort(result.begin(), result.end(), [](string& x, string& y) {
+            return x + y > y + x;
+        });
+        // for (int i = 0; i < result.size()-1; ++i){
+        //     for (int j = 0; j < result.size()-1; ++j){
+        //         if (largestNumberHelper(result[j], result[j+1])){
+        //             swap(result[j], result[j+1]);
+        //         }
+        //     }
+        // }
+        string res;
+        if (result[0] == "0") return "0";
+        for (auto s:result){
+            res+=s;
+        }
+        return res;
+    }
+    //s1<s2返回true
+    bool largestNumberHelper(string s1, string s2){
+        return (s1+s2)<(s2+s1)?true:false;
+    }
+    /**
      * @name: 199.二叉树的右视图
      * @msg: 给定一棵二叉树，想象自己站在它的右侧，按照从顶部到底部的顺序，返回从右侧所能看到的节点值。
      */
@@ -767,6 +999,40 @@ public:
     int calculate(string s)
     {
     }
+
+    /**
+     * @name: 253 会议室2
+     * @msg: 
+     * @param {type} 
+     * @return: 
+     */    
+    int minMeetingRooms(vector<vector<int>>& intervals) {
+        if (intervals.size() == 0 ) return 0;
+        sort(intervals.begin(),intervals.end());
+        int max = 0;
+        vector<vector<int> > meetingRoom;
+        for (int i = 0; i<intervals.size(); i++){
+            int num=0;
+            if (meetingRoom.empty()) {
+                meetingRoom.push_back(intervals[i]);
+                continue;
+            }
+            int left = intervals[i][0]; int right = intervals[i][1];
+            for (int j = 0; j < meetingRoom.size(); j++){
+                if (meetingRoom[j][1]<=left||meetingRoom[j][0]>=right){
+                    meetingRoom[j][0] = left;
+                    meetingRoom[j][1] = right;
+                }
+                else if (j+1==meetingRoom.size()){
+                    meetingRoom.push_back(intervals[i]);
+                    break;
+                }
+            }
+            
+        }
+        return meetingRoom.size();
+    }
+
     /**
      * @name: 459. 重复的子字符串
      * @msg: 给定一个非空的字符串，判断它是否可以由它的一个子串重复多次构成。给定的字符串只含有小写英文字母，并且长度不超过10000。
@@ -861,6 +1127,59 @@ public:
         }
     };
     /**
+     * @name: 695.岛屿的最大面积
+     * @msg: 
+     * @param {type} 
+     * @return: 
+     */    
+    int direction[4][2] = {
+            {0,1},  //right
+            {0,-1},  //left
+            {-1,0},  //up
+            {1,0}   //down
+        };
+    int row;
+    int col;
+    int maxAreaOfIsland(vector<vector<int>>& grid) {
+        row = grid.size();
+        col = grid[0].size();
+
+        pair<int, int> start(0, 0);
+        int maxStep = 0;
+        for(int i = 0; i<row; i++){
+            start.first = i; 
+            for (int j = 0; j<col; j++){
+                int step=0;
+                start.second = j;
+                if (grid[start.first][start.second]==0)
+                    continue;
+                maxAreaOfIslandDFS(grid, start, step);
+                maxStep = maxStep < step ? step:maxStep;
+            }
+        }
+        return maxStep;
+    }
+    void maxAreaOfIslandDFS(vector<vector<int>>& grid, pair<int, int> pos, int &step){
+        if (grid[pos.first][pos.second]==1){
+            step++;
+            grid[pos.first][pos.second] = 0;
+            pair<int, int> nextPos(pos);
+            for(int k=0; k<4;++k){
+                nextPos.first = pos.first + direction[k][0];
+                nextPos.second = pos.second + direction[k][1];
+                if (nextPos.first < 0 || nextPos.first >= row || nextPos.second < 0 || nextPos.second >= col)
+                {
+                    continue;
+                }
+                maxAreaOfIslandDFS(grid, nextPos, step);
+            }
+        }
+        else{
+            return;
+        }
+
+    }
+    /**
      * @name: 735.行星碰撞
      * 对于数组中的每一个元素，其绝对值表示行星的大小，正负表示行星的移动方向（正表示向右移动，负表示向左移动）。每一颗行星以相同的速度移动。
      * 找出碰撞后剩下的所有行星。碰撞规则：两个行星相互碰撞，较小的行星会爆炸。如果两颗行星大小相同，则两颗行星都会爆炸。两颗移动方向相同的行星，永远不会发生碰撞。
@@ -950,6 +1269,71 @@ public:
         return result;
     }
     /**
+     * @name: 945.使数组唯一的最小增量
+     * @msg: 
+     * @param {type} 
+     * @return: 
+     */    
+    int minIncrementForUnique(vector<int>& A) {
+        if (A.empty() || A.size() == 1) return 0;
+        
+        sort(A.begin(), A.end());
+        int temp = A[0];
+        int ans = 0;
+        auto it = (A.begin()+1);
+        for (; it != A.end(); it++){
+            if (*it > temp) {
+                temp = *it;
+                continue;
+            }
+            else {
+                // auto itr_swap = find(it, A.end(), (temp+1));
+                // if (itr_swap != A.end()){
+                //     swap(*it, *itr_swap);
+                //     temp = *it;
+                //     continue;
+                // }
+                //没有找到增1元素，需要将本元素自增至此值
+                ans += (temp+1 - *it);
+                temp++;
+            }
+        }
+        return ans;
+    }
+    /**
+     * @name: 1013.将数组分成和相等的三个部分
+     * @msg: 给你一个整数数组 A，只有可以将其划分为三个和相等的非空部分时才返回 true，否则返回 false。
+     * 形式上，如果可以找出索引 i+1 < j 且满足 (A[0] + A[1] + ... + A[i] == A[i+1] + A[i+2] + ... + A[j-1] == A[j] + A[j-1] + ... + A[A.length - 1]) 就可以将数组三等分。
+     * @param {type} 
+     * @return: 
+     */
+    bool canThreePartsEqualSum(vector<int> &A)
+    {
+        int sum = accumulate(A.begin(), A.end(), 0);
+        if (sum % 3 != 0 || A.size() <= 3)
+            return false;
+        sum /= 3;
+        auto it_front = A.begin();
+        auto it_back = --A.end();
+        int front, back;
+        front = *it_front;
+        back = *it_back;
+        if (front != sum)
+            it_front++;
+        if (back != sum)
+            it_back--;
+        while (it_front < it_back)
+        {
+            if (front != sum)
+                front += (*it_front++);
+            if (back != sum)
+                back += (*it_back--);
+            if (front == sum && back == sum && it_front <= it_back)
+                return true;
+        }
+        return false;
+    }
+    /**
      * @name: 1041. 困于环中的机器人
      * @msg: 在无限的平面上，机器人最初位于 (0, 0) 处，面朝北方。机器人可以接受下列三条指令之一：
      * "G"：直走 1 个单位
@@ -959,7 +1343,7 @@ public:
      * 只有在平面中存在环使得机器人永远无法离开时，返回 true。否则，返回 false。
      * @tip: 如果可以循环最多执行四次，如果不可以循环，一定是因为第一次结束后点的位置不是（0，0）且指向正北
      * 
-     */
+     */    
     bool isRobotBounded(string instructions)
     {
         int x = 0, y = 0;
@@ -991,6 +1375,38 @@ public:
             return false;
         else
             return true;
+    }
+    /**
+     * @name: 1160.拼写单词
+     * @msg: 
+     * @param {type} 
+     * @return: 
+     */    
+    int countCharacters(vector<string>& words, string chars) {
+        map<char, int> t;
+        for (int i =0; i<26; ++i){
+            t[i+'a'] = 0;
+        }
+        map<char, int> cmp(t);
+        for (int j = 0; j<chars.size(); j++){
+                t[chars[j]]+=1;
+        } 
+        vector<int> number;
+        for (int i = 0; i<words.size(); ++i){
+            map<char, int> temp = cmp;
+            for (int j = 0; j<words[i].size(); ++j){
+                temp[words[i][j]]+=1;
+                if(t[words[i][j]] < temp[words[i][j]])
+                    break; 
+                if(t[words[i][j]] >= temp[words[i][j]]&&j==words[i].size()-1)
+                    number.push_back(i);
+            }
+        }
+        int length = 0;
+        for (auto n:number){
+            length += words[n].size();
+        }
+        return length;
     }
     /**
      * @name: 二维网格迁移
@@ -1028,4 +1444,281 @@ public:
         }
         return grid;
     }
+    /**
+     * @name: 面试题01.06 字符串压缩
+     * @msg: 
+     * @param {type} 
+     * @return: 
+     */    
+    string compressString(string S) {
+        string result;
+        int length = S.size();
+        if ( length <=1 ) return S;
+        char the_word = S[0];
+        int count = 1;
+        for (int i=1;i<length;++i){
+            
+            if (S[i] == the_word){
+                count++;
+            }
+            if (S[i] != the_word){
+                result += (the_word+to_string(count));
+                count = 1;
+            }
+            the_word = S[i];
+        }
+        result += (the_word+to_string(count));
+        return length <= result.size()?S:result;
+    }
+    /**
+     * @name: 面试题 17.17. 多次搜索
+     * @msg: 
+     * @param {type} 
+     * @return: 
+     */    
+    vector<vector<int>> multiSearch(string big, vector<string> &smalls)
+    {
+        vector<vector<int>> res;
+        int big_length = big.size();
+        // if (big_length==0) return res;
+        for (int i = 0; i < smalls.size(); i++)
+        {
+            vector<int> pos_vec;
+            int length = smalls[i].size();
+            if (length == 0)
+            {
+                res.push_back(pos_vec);
+                continue;
+            }
+            string::size_type position;
+            position = big.find(smalls[i]);
+            if (position != big.npos)
+            {
+                while (position < big_length)
+                {
+                    pos_vec.push_back(position);
+                    string smallsubstr;
+                    if (position + 1 == big_length)
+                    {
+                        smallsubstr = big[position];
+                    }
+                    else
+                    {
+                        smallsubstr = big.substr(position + 1, big.size() - (position + 1));
+                    }
+                    string::size_type sub_position;
+                    sub_position = smallsubstr.find(smalls[i]);
+                    if (sub_position != big.npos)
+                    {
+                        position = position + 1 + sub_position;
+                    }
+                    else
+                        break;
+                }
+            }
+            res.push_back(pos_vec);
+        }
+        return res;
+    }
+
+    bool exist(vector<vector<char>>& board, string word) {
+        if (board.empty()) return false;
+        row = board.size();
+        col = board[0].size();
+        vector<vector<bool> > flag(board.size(), vector<bool>(board[0].size(), false));
+        for (int i = 0; i< board.size(); i++){
+            for (int j = 0; j<board[0].size(); j++){
+                if (board[i][j] == word[0] && !flag[i][j]) {
+                    flag[i][j] = true;
+                    pair<int, int> pos(i,j);
+                    if (exitDFS(board,pos, word, 0, flag)){
+                        return true;
+                    }
+                    flag[i][j] = false;
+                }
+                
+            }
+        }
+        return false;
+    }
+    bool exitDFS(vector<vector<char>>& grid, pair<int, int> pos, string word, int head, vector<vector<bool> > &flag){
+        if ( head == word.size()-1) 
+                return true;
+        bool is = false;
+        pair<int, int> nextPos(pos);
+        for(int k=0; k<4;++k){
+            // 判断四个方向
+            nextPos.first = pos.first + direction[k][0];
+            nextPos.second = pos.second + direction[k][1];
+            if ((nextPos.first < 0 || nextPos.first >= row || nextPos.second < 0 || nextPos.second >= col))
+            {
+                //超出索引 || 重复位置
+                continue;
+            }
+            if (grid[nextPos.first][nextPos.second]==word[head+1] && flag[nextPos.first][nextPos.second] != true){
+            
+                flag[nextPos.first][nextPos.second] =  true;
+                is = is || exitDFS(grid, nextPos, word, head+1, flag);
+                flag[nextPos.first][nextPos.second] =  false;
+            }
+            
+        }
+        return is;
+
+    }
+
+    double myPow(double x, int n) {
+        if (x == 0.0) return 1.0;
+        if (n == 0.0) return 1.0;
+        if (n<0){
+            x = 1/x;
+        }
+        int i = 0;
+        stack<int> stk;
+        unsigned int flag = 1;
+        while (n){
+            if (n&flag)
+            {
+                stk.push(i);
+                n = n ^ flag;
+            }
+            i++;
+            flag = flag << 1;
+        }
+        double res=1;
+        while(!stk.empty()){
+            int ind = 1;
+            double temp = x;
+            for (int k = 0; k<stk.top(); k++){
+                ind*=2;
+            }
+            stk.pop();
+            for (int k = 0; k<ind; k++){
+                temp= x*temp;
+            }
+            res*=temp;
+        }
+        return res;
+    }
+    
+    //周赛 4-12
+    vector<string> stringMatching(vector<string>& words) {
+        if (words.size()<=1) return {};
+        
+        vector<string> res;
+        vector<bool> ans(words.size(), false); // 每一位是否需要去除
+        
+        for (int i = 0;i<words.size(); ++i){
+            for (int j = i+1 ;j<words.size();++j){
+                if (words[i].size()>=words[j].size()){
+                    if(words[i].find(words[j])!=words[i].npos){
+                        ans[j] = true;
+                    }
+                }
+                else{
+                    if(words[j].find(words[i])!=words[j].npos){
+                        ans[i] = true;
+                    }
+                }
+            }
+        }
+        for (int k = 0; k<ans.size(); ++k){
+            //cout << ans[k] << " ";
+            if (ans[k]==true){
+                res.push_back(words[k]);
+            }
+        }
+        return res;
+    }
+
+    vector<int> processQueries(vector<int>& queries, int m) {
+        vector<int> temp(m);
+        for (int i =0; i<m; i++){
+            temp[i] = i+1;
+        }
+        vector<int> ans;
+        for (int i = 0; i<queries.size(); ++i){
+            int position = queries[i];
+            auto itr = find(temp.begin(), temp.end(), position);
+            int time=0;
+            while(itr!=temp.begin()){
+                auto pre = itr-1;
+                swap(*itr--, *pre);
+                time++;
+            }
+            ans.push_back(time);
+        }
+        return ans;
+    }
+
+    string entityParser(string text) {
+        string ans;
+        
+        map<string, char> translate;
+        translate["&quot;"] = '\"';translate["&apos;"]='\'';
+        translate["&amp;"]='&';translate["&gt;"] = '>';
+        translate["&lt;"]='<';translate["&frasl;"]='/';
+        for (int i = 0; i<text.size(); i++){
+            if ( text[i] == '&'){
+                string temp;
+                int temp_i = i;
+                int j = i+1;
+                temp+='&';
+                while ( text[j]!=';'&& text[j]!='&' && j<text.size()){
+                    temp+=text[j];
+                    j++;
+                    i++;
+                }
+                if (text[j]==';'){
+                    temp += ';';
+                    if (translate.find(temp)!=translate.end()){
+                        ans+=translate[temp];
+                        i=j;
+                        continue;
+                    }
+                    else{
+                        ans+=temp;
+                        i = j;
+                        continue;
+                    }
+                }
+                if (text[j]=='&'||j==text.size()-1){
+                    ans+=temp;
+                    i = j;
+                    continue;
+                }
+            }
+            else
+                ans+=text[i];
+        }
+        return ans;
+    }
+
+    void function(vector<int> & input, int pos){
+        int time = input.size()/pos;
+        int j = 0;
+        while (time > 1){
+            
+            for (int i = j; i<pos+j; i++){
+                
+                swap(input[i],input[i+pos]);
+            }
+            j+=pos;
+            
+            time--;
+        }
+        if (j>input.size()) return;
+        else{
+            int count_left = pos;
+            for (int i = j+pos; i<input.size(); i++){
+                swap(input[i-pos], input[i]);
+                count_left--;
+            }
+            for ( int i = j+pos; i < input.size(); i++){
+                swap(input[i-count_left] , input[i]);
+            }
+            return;
+        }
+    }
+
 };

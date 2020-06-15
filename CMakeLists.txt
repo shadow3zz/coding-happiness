@@ -13,7 +13,7 @@ endif()
 
 find_package(wxWidgets COMPONENTS core base)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
 
 SET(CMAKE_C_COMPILER "/usr/bin/gcc") # 默认c编译器
 SET(CMAKE_CXX_COMPILER "/usr/bin/g++") # 默认c++编译器
@@ -31,6 +31,7 @@ SET(EXECUTABLE_OUTPUT_PATH "${PROJECT_SOURCE_DIR}/bin") # 可执行文件输出�
 
 INCLUDE_DIRECTORIES("${PROJECT_SOURCE_DIR}/include") # 头文件包含目录
 INCLUDE_DIRECTORIES("${PROJECT_SOURCE_DIR}/include/structures") # 头文件包含目录
+INCLUDE_DIRECTORIES("${PROJECT_SOURCE_DIR}/include/sort") # 头文件包含目录
 
 AUX_SOURCE_DIRECTORY(src DIR_SRCS) # 添加源代码文件夹, 自动扫描所有文件
 

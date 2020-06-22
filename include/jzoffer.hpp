@@ -4,7 +4,7 @@
  * @Author: shadow3zz-zhouchenghao@whut.edu.cn
  * @Date: 2020-06-04 21:46:03
  * @LastEditors: shadow3zz
- * @LastEditTime: 2020-06-16 00:00:49
+ * @LastEditTime: 2020-06-22 15:57:28
  */
 #pragma once
 
@@ -30,10 +30,11 @@ using namespace std;
 struct ListNode{
     int         m_nKey;
     ListNode*   m_pNext;
+    ListNode(int val):m_nKey(val),m_pNext(nullptr){}
 };
 ListNode* CreateListNode(int value)
 {
-    ListNode* pNode = new ListNode();
+    ListNode* pNode = new ListNode(0);
     pNode->m_nKey = value;
     pNode->m_pNext = nullptr;
 
@@ -52,8 +53,44 @@ void ConnectListNodes(ListNode* pCurrent, ListNode* pNext)
 /**================================================================================================
  * ------------------------------------------------------------------------------------------------
  *===============================================================================================*/
+/**================================================================================================
+ * ----------------------------------------二叉树结构----------------------------------------------
+ *===============================================================================================*/
+struct BinaryTreeNode{
+    int value;
+    BinaryTreeNode* m_pLeft;
+    BinaryTreeNode* m_pRight;
+    BinaryTreeNode* m_pParent;
+    BinaryTreeNode(int v = 0, BinaryTreeNode* pLeft=nullptr, BinaryTreeNode* pRight=nullptr)
+                    :value(v), m_pLeft(pLeft), m_pRight(pRight){}
+};
+BinaryTreeNode* CreateBinaryTreeNode(int value)
+{
+    BinaryTreeNode* pNode = new BinaryTreeNode();
+    pNode->value = value;
+    pNode->m_pLeft = nullptr;
+    pNode->m_pRight = nullptr;
+    pNode->m_pParent = nullptr;
 
+    return pNode;
+}
 
+void ConnectBinaryTreeNode(BinaryTreeNode* pParent, BinaryTreeNode* pLeft, BinaryTreeNode* pRight)
+{
+    if(pParent != nullptr)
+    {
+        pParent->m_pLeft = pLeft;
+        pParent->m_pRight = pRight;
+
+        if(pLeft != nullptr)
+            pLeft->m_pParent = pParent;
+        if(pRight != nullptr)
+            pRight->m_pParent = pParent;
+    }
+}
+/**================================================================================================
+ * ------------------------------------------------------------------------------------------------
+ *===============================================================================================*/
 
 /**
  * @name: 面试题1：赋值运算符函数
@@ -379,37 +416,6 @@ namespace PrintListReversing_Iteratively{
     }
 }
 
-struct BinaryTreeNode{
-    int value;
-    BinaryTreeNode* m_pLeft;
-    BinaryTreeNode* m_pRight;
-    BinaryTreeNode* m_pParent;
-    BinaryTreeNode(int v = 0, BinaryTreeNode* pLeft=nullptr, BinaryTreeNode* pRight=nullptr):value(v), m_pLeft(pLeft), m_pRight(pRight){}
-};
-BinaryTreeNode* CreateBinaryTreeNode(int value)
-{
-    BinaryTreeNode* pNode = new BinaryTreeNode();
-    pNode->value = value;
-    pNode->m_pLeft = nullptr;
-    pNode->m_pRight = nullptr;
-    pNode->m_pParent = nullptr;
-
-    return pNode;
-}
-
-void ConnectBinaryTreeNode(BinaryTreeNode* pParent, BinaryTreeNode* pLeft, BinaryTreeNode* pRight)
-{
-    if(pParent != nullptr)
-    {
-        pParent->m_pLeft = pLeft;
-        pParent->m_pRight = pRight;
-
-        if(pLeft != nullptr)
-            pLeft->m_pParent = pParent;
-        if(pRight != nullptr)
-            pRight->m_pParent = pParent;
-    }
-}
 
 
 
@@ -795,4 +801,858 @@ namespace RobotMove{
         }
         return count;
     }
+}
+
+/**
+ * @name: 面试题14.剪绳子
+ * @msg: 方法一是动态规划，自下而上，分析状态方程：f(n) = max{f(i)-f(n-i)} , 其中i属于(1,n-1)。
+ *       方法二是贪婪算法，求积最大，就将整数拆分成大量的3和少量的2. 
+ * @param {type} 
+ * @return: 
+ */
+namespace CuttingRope{
+    int maxProductAfterCutting_solution1(int n){
+        if (n < 2) return 0;
+        if (n == 2) return 1;
+        if (n == 3) return 2;
+
+        vector<int> dp(n+1, 0);
+        dp[0] = 0;
+        dp[1] = 1;
+        dp[2] = 2;
+        dp[3] = 3;
+
+        for (int i = 4; i<=n; ++i){
+            int max = 0;
+            for (int j = 1; j < 4; j++){
+                int temp = dp[j]*dp[i-j];
+                if (max < temp)
+                    max = temp;
+            }
+            dp[i] = max;
+        }
+
+        return dp.back();
+    }
+
+    int maxProductAfterCutting_solution2(int n){
+        if (n < 2) return 0;
+        if (n == 2) return 1;
+        if (n == 3) return 2;
+
+        // 尽可能多地减去长度为3的绳子段
+        int timesOf3 = n / 3;
+
+        // 当绳子最后剩下的长度为4的时候，不能再剪去长度为3的绳子段。
+        // 此时更好的方法是把绳子剪成长度为2的两段，因为2*2 > 3*1。
+        if(n - timesOf3 * 3 == 1)
+            timesOf3 -= 1;
+
+        int timesOf2 = (n - timesOf3 * 3) / 2;
+
+        return (int) (pow(3, timesOf3)) * (int) (pow(2, timesOf2));
+    }
+}
+
+/**
+ * @name: 面试题15.二进制中1的个数
+ * @msg: （1）考虑到负数是补码且最左边高位是符号位，向右移位是添加数字1，所以考虑将flag = 1，向左移位，比较数字的每一位
+ *       （2）一个数n,n&(n-1)即可将最右边的1置0，循环执行可将所有的1置0.
+ */
+namespace NumberOf1InBinary{
+    int NumberOf1_Solution1(int n){
+        int count = 0;
+        unsigned int flag = 1;
+        while(n){
+            if (n & flag) count++;
+            flag = flag << 1;
+        }
+        return count;
+    }
+
+    int NumberOf1_Solution2(int n){
+        int count;
+        while (n) {
+            n = n&(n-1);
+            count ++;
+        }
+        return count;
+    }
+
+    // 相关题目1 判断一个整数是不是2的整数次方  2 = 0000 0010 | 4 = 0000 0100 | 16 = 0001 0000
+    // 所以2的次方中其二进制数只有一位是1
+    bool JudgeNumberIsCube(int n){
+        if ((n&(n-1))) return false;
+        return true;
+    }
+}
+
+/**
+ * @name: 面试题16.数值的整数次方
+ * @msg: 要考虑次方是负数，底数是0的情况，除法可以用>>1来表示，奇数可以用（n&0x1==1）来表示。
+ */
+namespace Power{
+    double PowerWithUnsignedExponent(double base, unsigned int exponent);
+    bool equal(double num1, double num2)
+    {
+        if ((num1 - num2 > -0.0000001) && (num1 - num2 < 0.0000001))
+            return true;
+        else
+            return false;
+    }
+    double Power(double base, int exponent){
+        if (exponent<0 && equal(base, 0.0))  // 浮点数是否为0，不能直接和0.0比较，要做差值和一个极小数比较
+            return 0; //无效输入
+        unsigned int tempExponent;
+        if (exponent<0)
+            tempExponent =  (unsigned int)(-exponent);
+        else   
+            tempExponent = (unsigned int)exponent;
+        
+        double res = PowerWithUnsignedExponent(base, tempExponent);
+        if (exponent<0)
+            return 1.0/res;
+        return res;
+                
+    }
+    
+    double PowerWithUnsignedExponent(double base, unsigned int exponent)
+    {
+        if (exponent == 0)
+            return 1;
+        if (exponent == 1)
+            return base;
+
+        double result = PowerWithUnsignedExponent(base, exponent >> 1);
+        result *= result;
+        if ((exponent & 0x1) == 1)
+            result *= base;
+
+        return result;
+    }
+}
+
+/**
+ * @name: 面试题17.打印从1到最大的n位数
+ * @msg: 考虑大树问题，其次是要考虑赋值方式，这里用到DFS全排列。
+ */
+namespace Print1ToMaxOfNDigitsRecursively{
+    void PrintNumberDFS(string& str, vector<bool>& flag, int step, int n);
+    void PrintNumber(int n){
+        if (n <= 0) return;
+        string str(n,'0');
+        vector<bool> flag(n, false);
+        PrintNumberDFS(str, flag, 0, n);
+    }
+
+    void PrintNumberDFS(string& str, vector<bool>& flag, int step, int n){
+        if (step>=n){
+            int ZeroFlag = true;
+            for (int k = 0; k<n; k++){
+                if (str[k] == '0' && ZeroFlag){
+                    if (k == n-1)
+                        cout << int(0);
+                    continue;
+                }
+                ZeroFlag = false;
+                cout << str[k];
+            }
+            cout << endl;
+            return;
+        } 
+        for (int j = 0; j<n; j++){
+            if (!flag[j]){
+                flag[j] = true;
+                for(int i = 0; i<10; i++){
+                        str[step] = i+'0';
+                        PrintNumberDFS(str, flag, step+1, n);
+                }
+                flag[j] = false;
+            }
+        }
+    }
+}
+
+/**
+ * @name: 面试题18.（1）删除链表的指定结点 （2）删除链表中重复的结点
+ * @msg: （1）要考虑三种情况，当前结点为一般节点，为尾结点，或链表只有一个结点
+ *       （2）初始化一个参考值，如果链表下一个元素不为空，且数值不重复，移位下一个结点，如果下一个结点为空，那么结束，下一个不为空，下一个结点删除
+ */
+namespace DeleteListNode{
+    void DeleteNode(ListNode** pListHead, ListNode* pToBeDeleted){
+        if ((!pListHead) || (!pToBeDeleted))
+            return;
+        if(pToBeDeleted->m_pNext){
+            ListNode* pNext = pToBeDeleted->m_pNext;
+            pToBeDeleted->m_nKey = pNext->m_nKey;
+            pToBeDeleted->m_pNext = pNext->m_pNext;
+            delete pNext; 
+        }
+        // 链表只有一个结点，删除头结点（也是尾结点）
+        else if(*pListHead == pToBeDeleted)
+        {
+            delete pToBeDeleted;
+            pToBeDeleted = nullptr;
+            *pListHead = nullptr;
+        }
+        // 链表中有多个结点，删除尾结点
+        else
+        {
+            ListNode* pNode = *pListHead;
+            while(pNode->m_pNext != pToBeDeleted)
+            {
+                pNode = pNode->m_pNext;            
+            }
+    
+            pNode->m_pNext = nullptr;
+            delete pToBeDeleted;
+            pToBeDeleted = nullptr;
+        }
+    }
+    // 三指针法，
+    void DeleteDuplication(ListNode** pHead){
+        if(pHead == nullptr || *pHead == nullptr)
+            return;
+        ListNode* pPreNode = nullptr;
+        ListNode *pNext = nullptr;
+        ListNode* pNode = *pHead;
+        if (pNode){
+            pNext = pNode->m_pNext;
+            bool needDelete = false;
+            if (pNext!=nullptr && pNode->m_nKey == pNext->m_nKey)
+                needDelete = true;
+            if (!needDelete){
+                pPreNode = pNode;
+                pNode = pNext;
+            }
+            else{
+                int value = pNode->m_nKey;
+                ListNode* NeedDeleteNode = pNode;
+                while (NeedDeleteNode && NeedDeleteNode->m_nKey == value){
+                    pNext = NeedDeleteNode->m_pNext;
+                    delete NeedDeleteNode;
+                    NeedDeleteNode = nullptr;
+                    NeedDeleteNode = pNext;
+                }
+                if (pPreNode == nullptr){
+                    *pHead = pNext; 
+                }
+                else{
+                    pPreNode->m_pNext = pNext;
+                }
+                pNode = pNext;
+            }
+        }
+    }
+}
+
+/**
+ * @name: 面试题19.正则表达式匹配
+ * @msg: 用递归实现有限状态机
+ * @param {type} 
+ * @return: 
+ */
+namespace RegularExpressions{
+
+    string::iterator str_end;
+    string::iterator pattern_end;
+    bool matchCore(string::iterator str, string::iterator pattern);
+
+    bool match(string str, string pattern){
+        if (str.size() == 0 || pattern.size() == 0)
+            return false;
+        
+        auto itr_str = str.begin();
+        auto itr_pattern = pattern.begin();
+        str_end = str.end();
+        pattern_end = pattern.end();
+        
+        return matchCore(itr_str, itr_pattern);
+    }
+    
+    bool matchCore(string::iterator str, string::iterator pattern){
+        if (str == str_end && pattern == pattern_end)
+            return true;
+        if (str != str_end && pattern == pattern_end)
+            return false;
+        if (*(pattern+1) == '*'){
+            if (*str == *pattern || (*pattern == '.' && str != str_end)){
+                return matchCore(str+1, pattern) || matchCore(str+1, pattern+2) || matchCore(str, pattern+2);
+            }
+            else{
+                return matchCore(str, pattern+2);
+            }
+        }
+        
+        if (*str == *pattern|| (*pattern=='.'&& str!=str_end)){
+            return matchCore(str+1, pattern+1);
+        }
+    }
+}
+
+/**
+ * @name: 面试题20.表示数值的字符串
+ * @msg: 首先A[.[B]][e|EC] 或者 .[B][e|EC] 形式，
+ *         首先A和C都是含有符号位的数，B是不含符号位数
+ *         根据指针位置变化，如果是符合要求的数字就+1，特殊情况时首位位点的，i不变的情况下看是不会点
+ * @param {type} 
+ * @return: 
+ */
+namespace NumericStrings{
+
+    bool isInteger(string &str, int &i);
+    bool isUnsignedInteger(string &str, int &i);
+
+    bool isNumeric(string &str){
+        if (str.size() == 0) 
+            return false;
+        int i = 0;
+        bool result = isInteger(str, i);
+
+        if (str[i] == '.'){
+            i++;
+            result = result || isUnsignedInteger(str, i);
+        }
+
+        if (str[i] == 'e' || str[i] == 'E'){
+            i++;
+            
+            result = result && isInteger(str, i);
+        }
+        return result && i==str.size();
+    }
+
+    bool isInteger(string &str, int &i){
+        if (str[i] == '+' || str[i] == '-')
+            ++i;
+        return isUnsignedInteger(str, i);
+    }
+    bool isUnsignedInteger(string &str, int &i){
+        int start = i;
+        while(i<str.size() && str[i]>0+'0' && str[i]< 9+'0')
+            ++i;
+        return i!=start?true:false;
+    }
+}
+
+/**
+ * @name: 面试题21.调整数组顺序使奇数位于偶数前面
+ * @msg: 双指针 一个位于数组begin，一个位于数组末尾，首部的指针遇到奇数+1，尾部的指针遇到偶数-1，然后交换两个指针所指的内容
+ */
+namespace ReorderArray{
+    bool isEven(int n);
+    void ReorderOddEven_1(vector<int> &input){
+        if (input.size() == 0) return ;
+        int i = 0, j = input.size()-1;
+        while(i<j){
+            if (!isEven(input[i]) && isEven(input[j]))
+            {
+                i++; j--;
+            }
+            else if (!isEven(input[i]) && !isEven(input[j])){
+                i++;
+            }
+            else if (isEven(input[i]) && !isEven(input[j])){
+                int temp = input[i];
+                input[i] = input[j];
+                input[j] = temp;
+                i++;j--;
+            }
+            else{
+                j--;
+            }
+        }
+    }
+
+    bool isEven(int n)
+    {
+        return (n & 1) == 0;
+    }
+}
+
+/**
+ * @name: 面试题22.链表中倒数第k个结点
+ * @msg: 考虑问题要全面：
+ *          1.输入链表是否有效，输入k是否有效
+ *          2.如果k大于链表长度需要不做处理，即初始化的nullptr结点输出
+ *          3.考虑特殊情况和初始条件
+ */
+namespace KthNodeFromEnd{
+    ListNode* FindKthToTail(ListNode* pListHead, unsigned int k){
+        if (!pListHead || k==0) return nullptr;
+        ListNode* pKthNode = nullptr;
+        ListNode* backNode = pListHead;
+        unsigned int i = 2;
+        if (k==1) pKthNode = pListHead;
+        while(backNode->m_pNext){
+
+            backNode = backNode->m_pNext;
+            if (i<k){
+                i++;
+            }
+            else if (i == k){
+                pKthNode = pListHead;
+                i++;
+            }
+            else{
+                pKthNode = pKthNode->m_pNext;
+            }
+        }
+        return pKthNode;
+    }
+}
+
+/**
+ * @name: 面试题23.链表中环的入口结点 (考虑链表中有重复结点)
+ * @msg: 1.确定链表中存在环，两个快慢指针，在环中相遇，标记相遇的结点
+ *       2.确定环中包含的结点数，通过1中相遇的结点，计数自增，再次到这个结点时，就是环的大小
+ *       3.双指针，一个指针先移动结点数次数，然后两个指针按照相同的方向+1，相遇时则是入口结点
+ * @param {type} 
+ * @return: 
+ */
+namespace EntryNodeInListLoop{
+    ListNode* MeetingNode(ListNode* pHead){
+        if (!pHead) return nullptr;
+        ListNode* Fast = pHead->m_pNext;
+        if (!Fast||!Fast->m_pNext) return nullptr;
+        ListNode* Slow = pHead;
+        while (Fast != Slow){
+            Fast = Fast->m_pNext;
+            if (!Fast||!Fast->m_pNext) return nullptr;
+            Fast = Fast->m_pNext;
+            Slow = Slow->m_pNext;
+        }
+        ListNode* NodeInLoop = Fast->m_pNext;
+        int count = 1;
+        while(NodeInLoop != Fast){
+            count++;
+            NodeInLoop = NodeInLoop->m_pNext;
+        }
+
+        Fast = pHead; Slow = pHead;
+        for (int i = 0; i<count; i++){
+            Fast = Fast->m_pNext;
+        }
+        while (Fast!=Slow)
+        {
+            Fast = Fast->m_pNext;
+            Slow = Slow->m_pNext;
+        }
+        return Fast;
+    }
+}
+
+/**
+ * @name: 面试题24.反转链表
+ * @msg: 通过画一张反转前和反转后的对比图，利用三个指针（当前结点，前一个结点、后一个结点），当前结点在另外两个结点之间来回切换。
+ *       最后下一个结点为空时，即到了反转链表的最后位置。
+ *       1.pNext记录下一个结点
+ *       2.pNode是当前需要修改的结点pNode->next指向pPre
+ *       3.pPre更新为当前结点，pNode更新为pNext
+ */
+namespace ReverseList{
+    ListNode* ReverseList(ListNode* pHead){
+        ListNode* pNode = pHead;
+        ListNode* pPre  = nullptr;
+        ListNode* ans = nullptr;        
+        while (pNode){
+            ListNode* pNext = pNode->m_pNext;
+            if (pNext == nullptr)
+                ans = pNode;
+            pNode->m_pNext = pPre;
+            pPre = pNode;
+            pNode = pNext;
+        }
+        return ans;
+    }
+}
+
+/**
+ * @name: 面试题25.合并两个排序的链表
+ * @msg: 递归实现
+ */
+namespace MergeSortedLists{
+    ListNode* Merge(ListNode* pHead1, ListNode* pHead2){
+        if(pHead1 == nullptr)
+            return pHead2;
+        else if(pHead2 == nullptr)
+            return pHead1;
+        
+        ListNode* pMergedHead = nullptr;
+        if(pHead1->m_pNext < pHead2->m_pNext)
+        {
+            pMergedHead = pHead1;
+            pMergedHead->m_pNext = Merge(pHead1->m_pNext, pHead2);
+        }
+        else
+        {
+            pMergedHead = pHead2;
+            pMergedHead->m_pNext = Merge(pHead1, pHead2->m_pNext);
+        }
+
+        return pMergedHead;
+
+    }
+}
+
+/**
+ * @name: 面试题26.树的子结构
+ * @msg: （1）树的遍历
+ *       （2）比较这两个子树是否相同 又是一个遍历
+ *       （3）和树的遍历相关的就是递归
+ */
+namespace SubstructureInTree{
+    bool DoesTree1HaveTree2(BinaryTreeNode* pRoot1, BinaryTreeNode* pRoot2);
+    bool HasSubtree(BinaryTreeNode* pRoot1, BinaryTreeNode* pRoot2){
+        bool result = false;
+        if(pRoot1 && pRoot2){
+            if (pRoot1->value == pRoot2->value)
+                result = DoesTree1HaveTree2(pRoot1, pRoot2);
+            if (!result)
+                result = HasSubtree(pRoot1->m_pLeft, pRoot2);
+            if (!result)
+                result = HasSubtree(pRoot1->m_pRight, pRoot2);;
+        }
+        return result;
+    }
+    bool DoesTree1HaveTree2(BinaryTreeNode* pRoot1, BinaryTreeNode* pRoot2){
+        if (!pRoot2)
+            return true;
+        if (!pRoot1)
+            return false;
+        if (pRoot1->value == pRoot2->value)
+            return DoesTree1HaveTree2(pRoot1->m_pLeft, pRoot2->m_pLeft) 
+                && DoesTree1HaveTree2(pRoot1->m_pRight, pRoot2->m_pRight);
+        else 
+            return false;
+    }
+}
+
+/**
+ * @name: 面试题27.二叉树的镜像
+ * @msg: （1）用递归的方式中序遍历每个结点，并且将左右子树交换，就是对指针的操作
+ *       （2）用循环的方式层次遍历，用栈和队列应该都可以，也是类似（1）将每个结点的左右子树交换
+ */
+namespace MirrorOfBinaryTree{
+    void MirrorRecursively(BinaryTreeNode *pNode){
+        if (pNode->m_pLeft == nullptr && pNode->m_pRight == nullptr)
+            return;
+        BinaryTreeNode* temp = pNode->m_pLeft;
+        pNode->m_pLeft = pNode->m_pRight;
+        pNode->m_pRight = temp;
+
+        if (pNode->m_pLeft)
+            MirrorRecursively(pNode->m_pLeft);
+        if (pNode->m_pRight)
+            MirrorRecursively(pNode->m_pRight);
+    }
+    
+    void MirrorIteratively(BinaryTreeNode* pNode){
+        if (pNode->m_pLeft == nullptr && pNode->m_pRight == nullptr)
+            return;
+        stack<BinaryTreeNode*> stk;
+        stk.push(pNode);
+        while (!stk.empty()){
+            BinaryTreeNode* pNode = stk.top();
+            stk.pop();
+            if (pNode->m_pLeft)
+                stk.push(pNode->m_pLeft);
+            if (pNode->m_pRight)
+                stk.push(pNode->m_pRight);
+            BinaryTreeNode* temp = pNode->m_pLeft;
+            pNode->m_pLeft = pNode->m_pRight;
+            pNode->m_pRight = temp;
+        }
+    }
+}
+
+/**
+ * @name: 面试题28.对称的二叉树
+ * @msg: 考察二叉树的遍历，中序遍历中先结点然后左右子树，那么如果对称的话，就一个左右 一个右左
+ */
+namespace SymmetricalBinaryTree{
+    bool isSymmetrical(BinaryTreeNode* pRoot1, BinaryTreeNode* pRoot2);
+
+    bool isSymmetrical(BinaryTreeNode* pRoot)
+    {
+        return isSymmetrical(pRoot, pRoot);
+    }
+
+    bool isSymmetrical(BinaryTreeNode* pRoot1, BinaryTreeNode* pRoot2){
+        if (pRoot1 == nullptr && pRoot2 == nullptr)
+            return true;
+        if (pRoot1 == nullptr || pRoot2 == nullptr)
+            return false;
+        if (pRoot1->value!=pRoot2->value)
+            return false;
+        
+        return isSymmetrical(pRoot1->m_pLeft, pRoot2->m_pRight)   //pRoot1是左右中序遍历
+            && isSymmetrical(pRoot1->m_pRight, pRoot2->m_pLeft);  //pRoot2是右左中序遍历
+    }
+}
+
+/**
+ * @name: 面试题29.顺时针打印矩阵
+ * @msg: 找规律，分层分析，将问题拆解
+ */
+namespace PrintMatrix{
+    void PrintMatrixInCircle(vector<vector<int>> &matrix, int m);
+    void PrintMatrixClockwisely(vector<vector<int>>& matrix){
+        if (matrix.size() == 0) return;
+
+        int columns = matrix[0].size(),  rows = matrix.size();
+        int start = 0;
+        while(columns > start * 2 && rows > start * 2)
+        {
+            PrintMatrixInCircle(matrix, start);
+
+            ++start;
+        }
+            
+    }
+    void printNumber(int number)
+    {
+        printf("%d\t", number);
+    }
+    void PrintMatrixInCircle(vector<vector<int>> &numbers, int start){
+        int endX = numbers[0].size() - 1 - start;
+        int endY = numbers.size() - 1 - start;
+
+        // 从左到右打印一行
+        for(int i = start; i <= endX; ++i)
+        {
+            int number = numbers[start][i];
+            printNumber(number);
+        }
+
+        // 从上到下打印一列
+        if(start < endY)
+        {
+            for(int i = start + 1; i <= endY; ++i)
+            {
+                int number = numbers[i][endX];
+                printNumber(number);
+            }
+        }
+
+        // 从右到左打印一行
+        if(start < endX && start < endY)
+        {
+            for(int i = endX - 1; i >= start; --i)
+            {
+                int number = numbers[endY][i];
+                printNumber(number);
+            }
+        }
+
+        // 从下到上打印一行
+        if(start < endX && start < endY - 1)
+        {
+            for(int i = endY - 1; i >= start + 1; --i)
+            {
+                int number = numbers[i][start];
+                printNumber(number);
+            }
+        }
+    }
+}
+
+/**
+ * @name: 面试题30.包含min函数的栈
+ * @msg: 利用辅助栈思维 将最小值保存在辅助栈中 辅助栈的大小和原来的栈相同
+ */
+namespace StackWithMin{
+    template <typename T> class StackWithMin
+    {
+    public:
+        StackWithMin() {}
+        virtual ~StackWithMin() {}
+
+        T& top();
+        const T& top() const;
+
+        void push(const T& value);
+        void pop();
+
+        const T& min() const;
+
+        bool empty() const;
+        size_t size() const;
+
+    private:
+        std::stack<T>   m_data;     // 数据栈，存放栈的所有元素
+        std::stack<T>   m_min;      // 辅助栈，存放栈的最小元素
+    };
+    
+    template <typename T> 
+    T& StackWithMin<T>::top(){
+        return m_data.top();
+    }
+
+    template <typename T>
+    const T& StackWithMin<T>::top() const{
+        return m_data.top();
+    }
+
+    template <typename T>
+    const T& StackWithMin<T>::min() const{
+        assert(m_data.size() > 0 && m_min.size() > 0);
+        return m_min.top();
+    }
+        
+    template <typename T>
+    void StackWithMin<T>::push(const T& value){
+        m_data.push(value);
+        if (m_min.empty())
+            m_min.push(value);
+        else{
+            if (m_min.top() > value)
+                m_min.push(value);
+            else
+                m_min.push(m_min.top());
+        }
+    }
+    template <typename T>
+    void StackWithMin<T>::pop(){
+        assert(m_data.size() > 0 && m_min.size() > 0);
+         m_data.pop();
+        m_min.pop();
+    }
+
+    template <typename T> bool StackWithMin<T>::empty() const
+    {
+        return m_data.empty();
+    }
+
+    template <typename T> size_t StackWithMin<T>::size() const
+    {
+        return m_data.size();
+    }
+}
+
+/**
+ * @name: 面试题31.栈的压入、弹出序列
+ * @msg: 模拟入栈和出栈过程 通过一个辅助栈 来比较栈顶元素和出栈序列之间的关系
+ */
+namespace StackPushPopOrder{
+    bool IsPopOrder(const vector<int> &pPush, const vector<int>& pPop){
+        if (pPop.empty() || pPush.empty())
+            return false;
+        auto itr_push = pPush.begin();
+        auto itr_pop  = pPop.begin();
+
+        stack<int> stk;
+        
+        while(itr_push!=pPush.end()){
+            if (stk.empty() || stk.top()!=*itr_pop){
+                stk.push(*itr_push);
+                itr_push++;
+                continue;
+            }
+            while (stk.top()==*itr_pop){
+                itr_pop++;
+                stk.pop();
+            }
+        }
+        while(!stk.empty() && itr_pop!=pPop.end()){
+            if(stk.top() == *itr_pop){
+                stk.pop();itr_pop++;
+            }
+            else 
+                return false;
+        }
+        if (stk.empty() && itr_pop==pPop.end())
+            return true;
+        return false;
+        
+    }
+}
+
+/**
+ * @name: 面试题32.三种层序遍历
+ * @msg: 熟练使用栈和队列，满足题目要求
+ *          （1）直接输出层序遍历结构，用队列即可
+ *          （2）分层输出层序遍历结果，用两个数值记录当前层数总共的结点和当前层剩余结点
+ *          （3）之字形打印，要用两个栈，一个栈存储正序，一个存储逆序
+ */
+namespace PrintTreeLevel{
+    void PrintFromTopToBottom(BinaryTreeNode* pRoot){
+        if (!pRoot) return;
+        queue<BinaryTreeNode*> queueTreeNode;
+        queueTreeNode.push(pRoot);
+        while (!queue.empty())
+        {   
+            BinaryTreeNode* pNode = queueTreeNode.front();
+            queue.pop();
+            printf("%d", pNode->value);
+            if (pNode->m_pLeft)
+                queue.push(pNode->m_pLeft);
+            if (pNode->m_pRight)
+                queue.push(pNode->m_pRight);
+        }
+    }
+    void PrintTreesInLines(BinaryTreeNode* pRoot){
+        if (!pRoot) return;
+        queue<BinaryTreeNode*> queueTreeNode;
+        queueTreeNode.push(pRoot);
+        while (!queue.empty())
+        int levelCount = 0;
+        int elementInEachLevel = 1;
+        while (!queue.empty())
+        {   
+            BinaryTreeNode* pNode = queueTreeNode.front();
+            queue.pop();
+            printf("%d", pNode->value);
+            if (pNode->m_pLeft){
+                queue.push(pNode->m_pLeft);
+                levelCount++;
+            }
+            if (pNode->m_pRight){
+                queue.push(pNode->m_pRight);
+                levelCount++
+            }
+                
+            elementInEachLevel--;
+            if (elementInEachLevel == 0){
+                printf("\n");
+                elementInEachLevel = levelCount;
+                levelCount = 0;
+            }
+        }
+    }
+    
+    void PrintTreesInZigzag(BinaryTreeNode* pRoot){
+         if (!pRoot)
+            return ;
+        stack<BinaryTreeNode*> stk[2];
+        int current = 0;
+        int next = 1;
+        stk[current].push(pRoot);
+        while (!stk[1].empty() || !stk[2].empty()){
+            BinaryTreeNode* pNode = stk[current].top();
+            stk[current].pop();
+            printf("%d", pNode->value);
+            if (current){
+                if(pNode->m_pLeft != nullptr)
+                    stk[next].push(pNode->m_pLeft);
+                if(pNode->m_pRight != nullptr)
+                    stk[next].push(pNode->m_pRight);
+            }
+            else{
+                if(pNode->m_pRight != nullptr)
+                    stk[next].push(pNode->m_pRight);
+                if(pNode->m_pLeft != nullptr)
+                    stk[next].push(pNode->m_pLeft);
+            }
+            if (stk[current].empty()){
+                printf("\n");
+                current = 1-current;
+                next = 1-next;
+            }
+        }
+    }
+}
+
+namespace SquenceOfBST{
+    
 }

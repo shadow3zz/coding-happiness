@@ -4,23 +4,10 @@
  * @Author: shadow3zz-zhouchenghao@whut.edu.cn
  * @Date: 2020-06-04 21:46:03
  * @LastEditors: shadow3zz
- * @LastEditTime: 2020-06-22 15:57:28
+ * @LastEditTime: 2020-06-23 23:16:56
  */
 #pragma once
 
-// #include <iostream>
-// #include <string>
-// #include <vector>
-// #include <map>
-// #include <stack>
-// #include <cstring>
-// #include <cstdio>
-// #include <algorithm>
-// #include <iterator>
-
-// // 多线程头文件
-// #include <thread>
-// #include <mutex>
 #include <bits/stdc++.h>
 using namespace std;
 
@@ -50,9 +37,6 @@ void ConnectListNodes(ListNode* pCurrent, ListNode* pNext)
 
     pCurrent->m_pNext = pNext;
 }
-/**================================================================================================
- * ------------------------------------------------------------------------------------------------
- *===============================================================================================*/
 /**================================================================================================
  * ----------------------------------------二叉树结构----------------------------------------------
  *===============================================================================================*/
@@ -89,8 +73,85 @@ void ConnectBinaryTreeNode(BinaryTreeNode* pParent, BinaryTreeNode* pLeft, Binar
     }
 }
 /**================================================================================================
+ * ----------------------------------------复杂链表结构--------------------------------------------
+ *===============================================================================================*/
+struct ComplexListNode
+{
+    int                 m_nValue;
+    ComplexListNode*    m_pNext;
+    ComplexListNode*    m_pSibling;
+};
+ComplexListNode* CreateNode(int nValue);
+void BuildNodes(ComplexListNode* pNode, ComplexListNode* pNext, ComplexListNode* pSibling);
+void PrintList(ComplexListNode* pHead);
+ComplexListNode* CreateNode(int nValue)
+{
+    ComplexListNode* pNode = new ComplexListNode();
+    
+    pNode->m_nValue = nValue;
+    pNode->m_pNext = nullptr;
+    pNode->m_pSibling = nullptr;
+
+    return pNode;
+}
+void BuildNodes(ComplexListNode* pNode, ComplexListNode* pNext, ComplexListNode* pSibling)
+{
+    if(pNode != nullptr)
+    {
+        pNode->m_pNext = pNext;
+        pNode->m_pSibling = pSibling;
+    }
+}
+void PrintList(ComplexListNode* pHead)
+{
+    ComplexListNode* pNode = pHead;
+    while(pNode != nullptr)
+    {
+        printf("The value of this node is: %d.\n", pNode->m_nValue);
+
+        if(pNode->m_pSibling != nullptr)
+            printf("The value of its sibling is: %d.\n", pNode->m_pSibling->m_nValue);
+        else
+            printf("This node does not have a sibling.\n");
+
+        printf("\n");
+
+        pNode = pNode->m_pNext;
+    }
+}
+/**================================================================================================
  * ------------------------------------------------------------------------------------------------
  *===============================================================================================*/
+/**
+ * @name: 十种排序算法
+ * @msg: 
+ * @param {type} 
+ * @return: 
+ */
+namespace SORT{
+    /**
+     * @name: 1.插入排序
+     * @msg: 从第二个元素开始，依次比较前面的元素，如果前面元素大于当前temp就将前面元素后移一位，
+     *       直到遇到比本元素小的，将temp插入到这个元素后面。
+     *       |---O(n^2)---稳定---|
+     */    
+    template<typename T>
+    void insertSort(vector<T> &vec){
+        size_t j;
+        for (size_t i = 1; i<vec.size(); i++){
+            T temp = vec[i];
+            for ( j = i; j>0 && temp < vec[j-1]; j--){
+                vec[j] = vec[j-1];
+            }
+            vec[j] = temp;
+        }
+    }
+
+    template<typename T>
+    void quickSort(vector<T> &vec){
+    
+    }
+}
 
 /**
  * @name: 面试题1：赋值运算符函数
@@ -416,9 +477,6 @@ namespace PrintListReversing_Iteratively{
     }
 }
 
-
-
-
 /**
  * @name: 面试题7.重建二叉树
  * @msg: 重建二叉树有多种方法，主要看提供哪些信息：
@@ -570,38 +628,6 @@ namespace Fibonacci{
             dp[i] = dp[i-1] + dp[i-2];
         }
         return dp.back();
-    }
-}
-
-/**
- * @name: 十种排序算法
- * @msg: 
- * @param {type} 
- * @return: 
- */
-namespace SORT{
-    
-    /**
-     * @name: 1.插入排序
-     * @msg: 从第二个元素开始，依次比较前面的元素，如果前面元素大于当前temp就将前面元素后移一位，
-     *       直到遇到比本元素小的，将temp插入到这个元素后面。
-     *       |---O(n^2)---稳定---|
-     */    
-    template<typename T>
-    void insertSort(vector<T> &vec){
-        size_t j;
-        for (size_t i = 1; i<vec.size(); i++){
-            T temp = vec[i];
-            for ( j = i; j>0 && temp < vec[j-1]; j--){
-                vec[j] = vec[j-1];
-            }
-            vec[j] = temp;
-        }
-    }
-
-    template<typename T>
-    void quickSort(vector<T> &vec){
-    
     }
 }
 
@@ -1580,36 +1606,36 @@ namespace PrintTreeLevel{
         if (!pRoot) return;
         queue<BinaryTreeNode*> queueTreeNode;
         queueTreeNode.push(pRoot);
-        while (!queue.empty())
+        while (!queueTreeNode.empty())
         {   
             BinaryTreeNode* pNode = queueTreeNode.front();
-            queue.pop();
+            queueTreeNode.pop();
             printf("%d", pNode->value);
             if (pNode->m_pLeft)
-                queue.push(pNode->m_pLeft);
+                queueTreeNode.push(pNode->m_pLeft);
             if (pNode->m_pRight)
-                queue.push(pNode->m_pRight);
+                queueTreeNode.push(pNode->m_pRight);
         }
     }
     void PrintTreesInLines(BinaryTreeNode* pRoot){
         if (!pRoot) return;
         queue<BinaryTreeNode*> queueTreeNode;
         queueTreeNode.push(pRoot);
-        while (!queue.empty())
+        
         int levelCount = 0;
         int elementInEachLevel = 1;
-        while (!queue.empty())
+        while (!queueTreeNode.empty())
         {   
             BinaryTreeNode* pNode = queueTreeNode.front();
-            queue.pop();
+            queueTreeNode.pop();
             printf("%d", pNode->value);
             if (pNode->m_pLeft){
-                queue.push(pNode->m_pLeft);
+                queueTreeNode.push(pNode->m_pLeft);
                 levelCount++;
             }
             if (pNode->m_pRight){
-                queue.push(pNode->m_pRight);
-                levelCount++
+                queueTreeNode.push(pNode->m_pRight);
+                levelCount++;
             }
                 
             elementInEachLevel--;
@@ -1620,6 +1646,7 @@ namespace PrintTreeLevel{
             }
         }
     }
+
     
     void PrintTreesInZigzag(BinaryTreeNode* pRoot){
          if (!pRoot)
@@ -1653,6 +1680,135 @@ namespace PrintTreeLevel{
     }
 }
 
+/**
+ * @name: 面试题33.二叉搜索树的后序遍历序列
+ * @msg: 后序遍历最后一个元素是根节点，前面i个是左子树，剩下的是右子树，左子树比根节点小，右子树相反。
+ */
 namespace SquenceOfBST{
-    
+    bool VerifySquenceOfBST(vector<int>& sequence){
+        if (sequence.empty())
+            return false;
+        int length = sequence.size();
+        int root = sequence[length-1];
+        int i = 0;
+        for (; i<length-1; ++i){
+            if (sequence[i]>root)
+                break;
+        }
+        int j = i;
+        for (; j<length-1; ++j){
+            if (sequence[j]<root)
+                return false;
+        }
+        bool left = true;
+        if (i>0){
+            auto temp = vector<int>(&sequence[0], &sequence[i]);
+            left = VerifySquenceOfBST(temp);
+        }
+        bool right =true;
+        if (i<length-1){
+            auto temp = vector<int>(&sequence[i], &sequence[length-1]);
+            right = VerifySquenceOfBST(temp);
+        }
+        return left&&right;
+    }
 }
+
+/**
+ * @name: 面试题34.二叉树中和为某一值的路径
+ * @msg: 利用二叉树遍历的思想 逐个遍历，计算数值
+ */
+namespace PathInTree{
+    void FindPath(BinaryTreeNode* pRoot, int expectedSum, vector<int> pathNode);
+    void FindPath(BinaryTreeNode* pRoot, int expectedSum){
+        if (!pRoot)
+            return ;
+        vector<int> pathNode;
+        FindPath(pRoot, expectedSum, pathNode);
+    }
+    void FindPath(BinaryTreeNode* pRoot, int expectedSum, vector<int> pathNode){
+        
+        pathNode.push_back(pRoot->value);
+        int Sum = 0;
+        Sum = accumulate(pathNode.begin(), pathNode.end(), 0);
+        if (Sum == expectedSum){
+            for (auto s:pathNode){
+                printf("%d\t", s);
+            }
+            printf("\n");
+        }
+        if (pRoot->m_pLeft)
+            FindPath(pRoot->m_pLeft, expectedSum, pathNode);
+        if (pRoot->m_pRight)
+            FindPath(pRoot->m_pRight, expectedSum, pathNode);
+        pathNode.pop_back();
+    }
+}
+
+/**
+ * @name: 面试题35.复杂链表的复制
+ * @msg: 深拷贝 指针所指空间是不一样的两个内存地址，所以需要new一个新的空间
+ *      这里用了map来存储这两个相同的指针
+ *      还有另外一种方法，将链表重新练一遍，然后pNode->m_pSibling->next = pClone->m_pSibling
+ */
+namespace CopyComplexList{
+    
+    ComplexListNode* Clone(ComplexListNode* pHead){
+        ComplexListNode* pNode = pHead;
+        map<ComplexListNode*, ComplexListNode*> container;
+        while(pNode){
+            ComplexListNode* pClone = new ComplexListNode();
+            pClone->m_nValue = pNode->m_nValue;
+            pClone->m_pNext = nullptr;
+            container[pNode] = pClone;
+            //container.insert(pair<ComplexListNode*, ComplexListNode*>(pNode, pClone));
+            
+            pNode = pNode->m_pNext;
+        }
+        for (auto itr = container.begin(); itr!=container.end(); itr++){
+            itr->second->m_pNext = container[itr->first->m_pNext];
+            itr->second->m_pSibling = container[itr->first->m_pSibling];
+        }
+        return container[pHead];
+    }
+}
+
+/**
+ * @name: 面试题36.二叉搜索树与双向链表
+ * @msg: 排序链表： 节点应从小到大排序，因此应使用 中序遍历 “从小到大”访问树的节点；
+         双向链表： 在构建相邻节点（设前驱节点 prepre ，当前节点 curcur ）关系时，不仅应 pre.right = curpre.right=cur ，也应 cur.left = precur.left=pre 。
+         循环链表： 设链表头节点 headhead 和尾节点 tailtail ，则应构建 head.left = tailhead.left=tail 和 tail.right = headtail.right=head 。
+ */
+namespace ConvertBinarySearchTree{
+    BinaryTreeNode* pre, *head;
+    void ConvertNode(BinaryTreeNode* pNode);
+
+    BinaryTreeNode* Convert(BinaryTreeNode* pRootOfTree){
+        if(pRootOfTree == nullptr)
+            return;
+        ConvertNode(pRootOfTree);
+        pre->m_pRight = head;
+        head->m_pLeft = pre;
+        return head;
+    }
+
+    void ConvertNode(BinaryTreeNode* pNode){
+        if(pNode == nullptr)
+            return;
+
+        BinaryTreeNode *pCurrent = pNode;
+
+        if (pCurrent->m_pLeft != nullptr)
+            ConvertNode(pCurrent->m_pLeft);
+
+        if (pre == nullptr) head = pCurrent;
+        else pre->m_pRight = pCurrent;
+
+        pCurrent->m_pLeft = pre;
+
+        if (pCurrent->m_pRight != nullptr)
+            ConvertNode(pCurrent->m_pRight);
+    }
+}
+
+

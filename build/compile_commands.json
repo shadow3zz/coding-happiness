@@ -1,7 +1,0 @@
-[
-{
-  "directory": "/home/sa/project/DSAA/build",
-  "command": "/usr/bin/g++   -DDEBUG -I/home/sa/project/DSAA/include -I/home/sa/project/DSAA/include/structures   -std=c++11  -O0 -Wall -g2 -ggdb   -o CMakeFiles/main.dir/src/main.cpp.o -c /home/sa/project/DSAA/src/main.cpp",
-  "file": "/home/sa/project/DSAA/src/main.cpp"
-}
-]

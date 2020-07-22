@@ -4,7 +4,7 @@
  * @Author: shadow3zz-zhouchenghao@whut.edu.cn
  * @Date: 2020-01-31 21:49:23
  * @LastEditors: shadow3zz
- * @LastEditTime: 2020-04-22 09:17:56
+ * @LastEditTime: 2020-07-03 12:34:45
  */
 
 #pragma once
@@ -101,7 +101,59 @@ public:
         }
         return max>sub_len?max:sub_len;
     }
-    
+    double findMedianSortedArrays(vector<int>& nums1, vector<int>& nums2) {
+        int vecSize = nums1.size() + nums2.size();
+        if (vecSize & 1){
+            // 两个数组长度和为奇数 那么中位数为两个数组合并后的num[vecSize/2]这个数，令k=vecSize/2,那么nums1[k/2]和nums2[k/2]较小数前面的k/2个数就可以被排除，接着继续找剩下数中第k-k/2个数
+            return findMedianSortedArrays(nums1, nums2, (vecSize+1)/2);
+        }
+        else{
+            // 两个数组长度和为偶数
+            int a =findMedianSortedArrays(nums1, nums2, vecSize/2);
+            int b = findMedianSortedArrays(nums1, nums2, vecSize/2+1);
+            return (a+b)/2;
+        }
+    }
+    double findMedianSortedArrays(vector<int>& nums1, vector<int>& nums2, int k) { 
+        if (nums1.size() == 0 || nums2.size() == 0)
+            return (nums1.size() == 0)?nums2[k-1]:nums1[k-1];
+        if (k==1)
+            return min (nums1[0], nums2[0]);
+
+        if (k/2<=nums1.size() && k/2<=nums2.size()){
+            if (nums1[k/2-1] <= nums2[k/2-1]){
+                vector<int> left(&nums1[k/2], &nums1[nums1.size()]);
+                return findMedianSortedArrays(left, nums2, k-k/2);
+            }
+            else{
+                vector<int> left(&nums2[k/2], &nums2[nums2.size()]);
+                return findMedianSortedArrays(nums1, left, k-k/2);
+            }
+        }
+        else{
+            if (nums1.size()<nums2.size()){
+                if (nums1.back() <= nums2[k/2-1]){
+                    vector<int> left = {};
+                    return findMedianSortedArrays(left, nums2, k-nums1.size());
+                }
+                else{
+                    vector<int> left(&nums2[k/2], &nums2[nums2.size()]);
+                    return findMedianSortedArrays(nums1, left, k-k/2);
+                }
+            }
+            else{
+                if (nums1[k/2-1] <= nums2.back()){
+                    vector<int> left(&nums1[k/2], &nums1[nums1.size()]);
+                    return findMedianSortedArrays(left, nums2, k-k/2);
+                }
+                else{
+                    vector<int> left = {};
+                    return findMedianSortedArrays(nums1, left, k-nums2.size());
+                }
+            }
+        }
+        
+    }
     /**
      * @name: 8. 字符串转换整数 (atoi)
      * @msg: 请你来实现一个 atoi 函数，使其能将字符串转换成整数。
@@ -1720,5 +1772,40 @@ public:
             return;
         }
     }
+    
 
+    vector<vector<int>> floodFill(vector<vector<int>>& image, int sr, int sc, int newColor) {
+        if (image.size() == 0) return image;
+        
+        int initValue = image[sr][sc];
+
+        if (initValue == newColor) return image;
+    
+        // vector<vector<int>> flag(image.size(), vector<bool>(image[0], false));
+        queue<pair<int, int> > pos;
+        pos.push(pair<int, int>(sr,sc));
+        image[sr][sc] = newColor;
+        while (!pos.empty()) {
+            floodFillBFS(image, initValue, newColor, pos);
+        }
+        return image;
+    }
+
+    void floodFillBFS(vector<vector<int>>& image,  int value, int newColor, queue<pair<int, int> > pos){
+        int nextPosX, nextPosY;
+        int tempX = pos.front().first;
+        int tempY = pos.front().second;
+        pos.pop();
+        for (int k = 0; k<4; ++k){
+            nextPosX = tempX + direction[k][0];
+            nextPosY = tempY + direction[k][1];
+            if (nextPosX < 0 || nextPosX >= image.size() || nextPosY < 0 || nextPosY >= image[0].size()) {
+                continue;
+            }
+            if (image[nextPosX][nextPosY] == value){
+                image[nextPosX][nextPosY] = newColor;
+                pos.push(pair<int, int>(nextPosX,nextPosY));
+            }
+        }
+    }
 };

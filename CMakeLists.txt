@@ -12,8 +12,8 @@ elseif(UNIX)
 endif()
 
 find_package(wxWidgets COMPONENTS core base)
-
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
+ADD_DEFINITIONS(-D_AFXDLL)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -w")
 
 SET(CMAKE_C_COMPILER "/usr/bin/gcc") # 默认c编译器
 SET(CMAKE_CXX_COMPILER "/usr/bin/g++") # 默认c++编译器

@@ -4,7 +4,7 @@
  * @Author: shadow3zz-zhouchenghao@whut.edu.cn
  * @Date: 2020-06-04 21:46:03
  * @LastEditors: shadow3zz
- * @LastEditTime: 2020-06-23 23:16:56
+ * @LastEditTime: 2020-07-22 16:46:30
  */
 #pragma once
 
@@ -18,6 +18,7 @@ struct ListNode{
     int         m_nKey;
     ListNode*   m_pNext;
     ListNode(int val):m_nKey(val),m_pNext(nullptr){}
+    ListNode(int x, ListNode *next) : m_nKey(x), m_pNext(next) {}
 };
 ListNode* CreateListNode(int value)
 {
@@ -146,12 +147,80 @@ namespace SORT{
             vec[j] = temp;
         }
     }
-
+    
+    /**
+     * @name: 2.快速排序
+     * @msg: 主要是找到中间元素，这里用的方法是随机下标作为中间值，将中间值移至集合末尾，逐个比较，
+     *       将vec[index]<vec[end]的元素和vec[small]交换，最后small的位置就是分割的位置，通过分治，解决子问题。
+     *       |---O(nlog2n)---不稳定---|
+     */    
+    int RandomInRange(int min, int max)
+    {
+        int random = rand() % (max - min + 1) + min;
+        return random;
+    }
+    template<typename T>
+    int Partition(vector<T> &vec, int i, int j){
+        int index = RandomInRange(i, j);
+        swap(vec[index], vec[j]);
+        int small = i-1;
+        for (index = i; index < j; index++){
+            if (vec[index]<vec[j]){
+                ++small;
+                swap(vec[small], vec[index]);
+            }
+        }
+        ++small;
+        swap(vec[small], vec[j]);
+        return small;
+    }
+    template<typename T>
+    void quickSort(vector<T> &vec, int i, int j){
+        if (i<j){
+            int index = Partition<T>(vec, i, j);
+            quickSort<T>(vec, i, index-1);
+            quickSort<T>(vec, index+1, j);
+        }
+    }
     template<typename T>
     void quickSort(vector<T> &vec){
-    
+        if (vec.empty()) return ;
+        int i = 0, j = vec.size()-1;
+        quickSort<T>(vec, i, j);
+    }
+    // 快排循环写法
+    template<typename T>
+    void quickSortLoop(vector<T> &vec){
+        int i = 0, j = vec.size()-1;
+        stack<int> stk;
+        stk.push(i);stk.push(j);
+        while (!stk.empty()){
+            int end = stk.top();stk.pop();
+            int start = stk.top();stk.pop();
+            if (start < end){
+                int index = RandomInRange(start, end);
+                swap(vec[index], vec[end]);
+                int small = start-1;
+                for (index = start; index<end; index++){
+                    if (vec[index]<vec[end]){
+                        ++small;
+                        swap(vec[index], vec[small]);
+                    }
+                }
+                ++small;
+                swap(vec[end], vec[small]);
+
+                stk.push(start);stk.push(small-1);
+                stk.push(small+1);stk.push(end);
+            }
+        }
+        for(auto s:vec){
+            cout << s << "\t" ;
+        }
+        cout << endl;
     }
 }
+
 
 /**
  * @name: 面试题1：赋值运算符函数
@@ -163,7 +232,7 @@ namespace SORT{
 class CMyString{
 public:
     CMyString(char *pData = nullptr){
-        if (pData = nullptr){
+        if (pData == nullptr){
             m_pData = new char[1];
             m_pData[0] = '\0';
         }
@@ -1114,6 +1183,36 @@ namespace RegularExpressions{
             return matchCore(str+1, pattern+1);
         }
     }
+    // 状态表示：dp[i][j]代表s的前i个字符和p的前j个字符是否匹配。
+    bool matchDP(string s, string p){
+        int n = s.length(), m = p.length();
+        vector<vector<bool> > dp(n+1, vector<bool>(m+1, false));
+        dp[0][0] = true; // s、p为空字符
+        for (int i = 1; i<=m; i++){
+            if (p[i-1] == '*' && dp[0][i-2]){
+                dp[0][i] = true;
+            }
+        }
+        for (int i = 1; i<=n; i++){
+            for (int j = 1; j<=m; j++){
+                if (s[i-1] == p[j-1] || p[j-1] == '.'){
+                    // 第i个字符匹配
+                    dp[i][j] = dp[i-1][j-1];
+                }
+                else if (p[j-1] == '*'){
+                    if (s[i-1] != p[j-2] && p[j-2] != '.'){
+                        // '~*'匹配空
+                        dp[i][j] = dp[i][j-2];
+                    }
+                    else{
+                        // '~*'匹配
+                        dp[i][j] = dp[i][j-2] || dp[i-1][j] || dp[i][j-1];
+                    }
+                }
+            }
+        }
+        return dp[n][m];
+    }
 }
 
 /**
@@ -1785,7 +1884,7 @@ namespace ConvertBinarySearchTree{
 
     BinaryTreeNode* Convert(BinaryTreeNode* pRootOfTree){
         if(pRootOfTree == nullptr)
-            return;
+            return nullptr;
         ConvertNode(pRootOfTree);
         pre->m_pRight = head;
         head->m_pLeft = pre;
@@ -1812,3 +1911,902 @@ namespace ConvertBinarySearchTree{
 }
 
 
+/**
+ * @name: 面试题37.序列化二叉树
+ * @msg: 序列化直接用前序遍历到叶子节点，并且是叶子节点的左右结点也要遍历，所以判断条件是在递归里的，而不是递归前
+ *       反序列化 首先要将序列按照流的形式读入，其实队列也可以，总之实现也是递归，递归里面要往下移位，遇到左右结点$这个就不操作，然后递归就会回答上一层根节点
+ */
+namespace SerializeBinaryTrees{
+    void Serialize(const BinaryTreeNode* pRoot, ostream& stream){
+        if (!pRoot){
+            stream << "$,";
+            return ;
+        }
+        stream << pRoot->value << ",";
+        Serialize(pRoot->m_pLeft, stream);
+        Serialize(pRoot->m_pRight, stream);
+    }
+    bool ReadStream(istream& stream, int* number){
+        if (stream.eof())
+            return false;
+        char buf[32];
+        buf[0] = '\0';
+
+        char ch;
+        stream >> ch;
+        int i = 0;       
+        while (!stream.eof() && ch!='$'){
+            buf[i++] = ch;
+            stream >> ch;
+        }
+        bool isNumeric = false;
+        if (i>0 && buf[0]!='$'){
+            *number = atoi(buf);
+            isNumeric = true;
+        }
+        return isNumeric;
+    }
+    void Deserialize(BinaryTreeNode** pRoot, istream& stream){
+        int number;
+        if (ReadStream(stream, &number)){
+            *pRoot = new BinaryTreeNode();
+            (*pRoot)->value = number;
+            (*pRoot)->m_pLeft = nullptr;
+            (*pRoot)->m_pRight = nullptr;
+            Deserialize(&((*pRoot)->m_pLeft), stream);
+            Deserialize(&((*pRoot)->m_pRight), stream);
+        }
+    }
+}
+
+/**
+ * @name: 面试题38.字符串的排列
+ * @msg: DFS 全遍历 将字符串分成两部分 不同于全排列 通过交换 并且将字符串分为交换部分和为交换部分
+ * @param {type} 
+ * @return: 
+ */
+namespace StringPermutation{
+    void Permutation(string& str, int i);
+    bool isSwap(string& str, int i, int j){
+        for (; i<j; i++){
+            if (str[i] == str[j])
+                return false;
+        }
+        return true;
+    }
+    void Permutation(string& str){
+        if (str.empty()) return ;
+        Permutation(str, 0);
+    }
+    void Permutation(string &str, int i){
+        
+        if (i == str.size()){
+            printf("%s\n", str.c_str());
+            return ;
+        }
+        for (int k = i; k<str.size(); ++k){
+            if (isSwap(str, i, k)){
+                swap(str[i], str[k]);
+                Permutation(str, i+1);
+                swap(str[i], str[k]);
+            }
+        }
+    }
+
+    //  输入三个字符a、b、c，组合有：a, b, c , ab, ac, bc, abc。
+    void Combination(string &str, size_t start, size_t number, vector<char> &result);
+    void Combination(string &str){
+        if (str.empty())
+            return ;
+        vector<char> result;
+        for (size_t i = 1;i<=str.size(); i++){
+            result.clear();
+            Combination(str, 0, i, result);
+        }
+    }
+    void Combination(string &str, size_t start, size_t number, vector<char> &result){
+        if (number == 0){
+            for (auto s:result){
+                cout << s;
+            }
+            cout << endl;
+            return ;
+        }
+        if (start >= str.size()) return;
+        result.push_back(str[start]);
+        Combination(str, start+1, number-1, result);
+        result.pop_back();
+        Combination(str, start+1, number, result);
+    }
+    
+    // 正方体对面顶点和相等数组
+    bool CubicEqualExist(vector<int> &numbers, int k);
+    bool CubicEqualExist(vector<int> &numbers) {
+        if (numbers.size()!=8) return false;
+        return CubicEqualExist(numbers, 0);
+    }
+    bool Judge(vector<int>& result){
+        if (result[0]+result[1]+result[2]+result[3] == result[4]+result[5]+result[6]+result[7]
+            && result[0]+result[2]+result[4]+result[6] == result[1]+result[3]+result[5]+result[7]
+            && result[0]+result[1]+result[4]+result[5] == result[2]+result[3]+result[6]+result[7])
+            return true;
+        return false;
+    }
+    bool isCubicSwap(vector<int> &numbers, int i, int k){
+        for (; i<k; i++){
+            if (numbers[i] == numbers[k])
+                return false;
+        }
+        return true;
+    }
+    bool CubicEqualExist(vector<int> &numbers, int i) {
+        if (i == numbers.size()){
+            return Judge(numbers);
+        }
+        bool flag = false;
+        for (int k = i; k<numbers.size(); k++){
+            if (isCubicSwap(numbers, i, k)){
+                swap(numbers[i], numbers[k]);
+                flag |= CubicEqualExist(numbers, i+1);
+                swap(numbers[i], numbers[k]);
+            }
+        }
+        return flag;
+    }
+}
+
+/**
+ * @name: 面试题39.数组中出现次数超过一半的数字
+ * @msg: 设置一个pair数据类型，first用来存元素，second用来计数，遍历过程中元素等于first，second++，
+ *       元素不等于first，second--，直到second==0，first设为新元素，并且second=1。直到最后second！=0
+ * @param {type} 
+ * @return: 
+ */
+namespace MoreThanHalfNumber{
+    bool CheckMoreThanHalf(vector<int>& numbers){
+        if (numbers.size() == 0) return false;
+        map<int, int> countNumber;
+        std::pair<int, int> pMax(numbers[0], 1);
+        
+        for(int n:numbers){
+            if (countNumber.find(n)==countNumber.end()){
+                countNumber[n] = 1;
+            }
+            else{
+                countNumber[n]+=1;
+            }
+            if (pMax.first!=n && pMax.second < countNumber[n]){
+                pMax.first = n;
+                pMax.second=countNumber[n];
+                continue;
+            }
+            if (pMax.first==n)
+                pMax.second = countNumber[n];
+        }
+
+        if (pMax.second <= numbers.size()/2)
+            return false;
+        else{
+            printf("超过数组长度的一半的数为：%d", pMax.first);
+            return true;
+        }
+        return false;
+    }
+}
+
+/**
+ * @name: 面试题40.最小的k个数
+ * @msg: 两种方法， 一种是分治法Partition，将输入排序
+ *                 另一种是另外的一个大小为k的最大堆存储，最大堆用set实现，因为set底层是红黑树
+ */
+namespace KLeastNumbers{
+    template<typename T> int Partition(vector<T> &vec, int i, int j);
+    int RandomInRange(int min, int max)
+    {
+        int random = rand() % (max - min + 1) + min;
+        return random;
+    }
+    vector<int> GetLeastNumbers_Solution1(vector<int> &input, int k){
+        if (input.size()<=0 || k<=0) return {};
+        // 将数组直接在index==k-1处分开
+        int i = 0, j = input.size()-1;
+        int index = Partition<int>(input, i, j);
+        while (index != k-1){
+            if (index<k-1)
+               { i = index+1;
+                index = Partition<int>(input, i, j);}
+            else
+                {j = index-1;
+                index = Partition<int>(input, i, j);}
+        }
+        return vector<int>(&input[0], &input[k]);
+    }
+    template<typename T>
+    int Partition(vector<T> &vec, int i, int j){
+        int index = RandomInRange(i, j);
+        swap(vec[index], vec[j]);
+        int small = i-1;
+        for (index = i; index < j; index++){
+            if (vec[index]<vec[j]){
+                ++small;
+                swap(vec[small], vec[index]);
+            }
+        }
+        ++small;
+        swap(vec[small], vec[j]);
+        return small;
+    }
+    vector<int> GetLeastNumbers_Solution2(vector<int> &input, int k){
+        multiset<int, greater<int> > intSet;
+        typedef multiset<int, greater<int> >::iterator setIterator;
+        vector<int> result;
+        auto itr = input.begin();
+        for (; itr!=input.end(); ++itr){
+            if (intSet.size() < k){
+                intSet.insert(*itr);
+            }
+            else{
+                setIterator greatest = intSet.begin();
+                if (*greatest > *itr){
+                    intSet.erase(greatest);
+                    intSet.insert(*itr);
+                }
+            }
+        }
+        setIterator itr_set =  intSet.begin();
+        for (; itr_set!=intSet.end(); itr_set++){
+            result.push_back(*itr_set);
+        }
+        return result;
+    }
+}
+
+/**
+ * @name: 面试题41.数据流中的中位数
+ * @msg: 通过两个最小堆和最大堆，将数据流分成两部分，一部分是最大堆中最大值是中位数的，一个是最小堆中最小值是中位数，满洲最大堆中的数普遍小于最小堆中的数。
+ */
+namespace StreamMedian{
+    template<typename T> class DynamicArray
+    {
+    public:
+        void Insert(T num){
+            // 容量为奇数，就将大数填到最小堆，有两种情况，、
+            // 1.这个数小于最大堆中的最大值，那么需要将这个数放到最大堆中，并将最大堆中的最大数，放到最小堆中
+            // 2.这个数大于最大堆中的最大值，直接放到最小堆中
+            if ( (max.size()+min.size()) & 1 == 0){
+                if (max.size()>0 && num < max[0]){
+                    max.push_back(num);
+                    push_heap(max.begin(), max.end(), less<T>());
+                    
+                    num = max[0];
+                    pop_heap(max.begin(), max.end(), less<T>());
+                    max.pop_back();
+                }
+                min.push_back(num);
+                push_heap(min.begin(), min.end(), greater<T>());
+            } 
+            // 容量为偶数，就将小数填到最大堆
+            // 1.如果这个数大于最小堆中的最小数，那么就要将最小堆中的最小数放到最大堆中，这个数放到最小堆里
+            // 2.如歌这个数小于最小堆中的最小数，那直接放到最大堆中
+            else{
+                if (min.size()>0 && num>min[0])
+                {
+                    min.push_back(num);
+                    push_heap(min.begin(), min.end(), greater<T>());
+                    num = min[0];
+                    pop_heap(min.begin(), min.end(), greater<T>());
+                    min.pop_back();
+                }
+                max.push_back(num);
+                push_heap(max.begin(), max.end(), less<T>());
+            }
+        }
+        
+        T GetMedian(){
+            int size = min.size() + max.size();
+            if(size == 0)
+                throw exception("No numbers are available");
+
+            T median = 0;
+            if((size & 1) == 1)
+                median = min[0];
+            else
+                median = (min[0] + max[0]) / 2;
+
+            return median;
+        }
+    
+    private:
+        vector<T> min;
+        vector<T> max;
+    };
+}
+
+/**
+ * @name: 面试题42.连续子数组的最大和
+ * @msg: 动态规划 找状态转移方程
+ */
+namespace GreatestSumOfSubarrays{
+    int FindGreatestSumOfSubArray(vector<int>& input){
+        if (input.empty())
+            return -1;
+        // 状态转移方程
+        // 1.f(i-1)<0 ---> f(i) = input[i];
+        // 2.f(i-1)>0 ---> f(i) = f(i-1) + input[i];
+        vector<int> dp(input.size(), 0);
+        dp[0] = input[0];
+        int i = 1;
+        for (; i<input.size(); i++){
+            if (dp[i-1]<0)
+                dp[i] = input[i];
+            else    
+                dp[i] = dp[i-1] + input[i];
+        }
+        return *max_element(dp.begin(), dp.end());
+    }
+}
+
+/**
+ * @name: 面试题43.从1到n整数中1出现的次数
+ * @msg: 将数字按位数拆分 递归
+ * @param {type} 
+ * @return: 
+ */
+namespace NumberOf1{
+    int Number1(string number);
+    int NumberOf1Between1AndN(unsigned int n){
+        string number = to_string(n);
+        return Number1(number);
+    }
+    int Number1(string number){   
+        if (number.size() == 0 || number[0] < '0' || number[0] > '9')
+            return 0;
+        if (number.size() == 1 && number[0] == '0')
+            return 0;
+        if (number.size() == 1 && number[0] >= '1')
+            return 1;
+        int numFirstDigit = 0;
+        string nextNumber(&number[1], &number[number.size()]);
+        if (number[0]>'1')
+            numFirstDigit = pow10(number.size()-1);
+        else
+            numFirstDigit = atoi(nextNumber.c_str()) + 1;
+        
+        int numOtherDigits = (number[0] - '0')*(number.size()-1)*pow10(number.size()-2);
+        int numRecursive = Number1(nextNumber);
+
+        return numFirstDigit + numOtherDigits + numRecursive;
+    }
+}
+
+/**
+ * @name: 面试题44：数字序列中某一位的数字
+ * @msg: 找规律
+ */
+namespace DigitsInSequence{
+    int digitAtIndex(int index){
+        if (index < 0) return -1;
+        int back = 10;
+        int countDig = 1;
+        while( index > back ){
+                countDig++;
+                index -= back;
+                back = countDig*pow10(countDig-1)*9;           
+        }
+        if (countDig == 1)
+            return index-1;
+        else{
+            int start = pow10(countDig-1);
+            int count = index/countDig;
+            string result = to_string(start+count);
+            
+            return result[(start+count)%countDig] - '0';
+        }
+    }
+}
+
+/**
+ * @name: 面试题45：把数组排成最小的数
+ * @msg: 比较mn和nm的大小就可以了
+ * @param {type} 
+ * @return: 
+ */
+namespace SortArrayForMinNumber{
+    bool Compare_str(const string& s1, const string& s2){
+        return s1+s2 < s2+s1;
+    }
+
+    void PrintMinNumber(vector<int> &input){
+        if (input.size() <=0 ) return ;
+        vector<string> vec;
+        for (auto &in:input){
+            vec.push_back(to_string(in));
+        }
+        sort(vec.begin(), vec.end(), Compare_str);
+        for (auto &a:vec){
+            cout<< a;
+        }
+    }
+}
+
+/**
+ * @name: 面试题46：把数字翻译成字符串 （求数量）
+ * @msg: 动态规划 f(i) = 1. f(i+1)               i,i+1不能组成符合要求的数字
+ *                       2. f(i+1) + f(i+2)      i,i+1能组成符合要求的数字，所以有两个子问题
+ */
+namespace TranslateNumbersToStrings{
+    int GetTranslationCount(int number){
+        if (number < 0) return 0;
+        if (number < 10) return 1;
+        string input = to_string(number);
+        vector<int> dp(input.size(), 0);
+        dp[input.size()-1] = 1;
+        int lastNumber = (input[input.size()-2]-'0')*10 + (input[input.size()-1]-'0');
+        if (lastNumber<=25 && lastNumber>=0){
+            dp[input.size()-2] = 2;
+        }
+        else  
+            dp[input.size()-2] = 1;
+        for (int i = input.size()-3; i>=0; i--){
+            
+            bool flag;          // i,i+1能否组成符合要求的数字
+            lastNumber = (input[i]-'0')*10 + (input[i+1]-'0');
+            if (lastNumber<=25 && lastNumber>=0){
+
+                flag = true;    // i,i+1能组成符合要求的数字，所以有两个子问题
+            }
+            else
+                flag = false;   // i,i+1不能组成符合要求的数字
+            dp[i] = flag ? (dp[i+1]+dp[i+2])  :dp[i+1];
+        }
+        return dp[0];
+    }
+}
+
+/**
+ * @name: 面试题47：礼物的最大价值
+ * @msg: dp 状态方程是 f(i,j) = max(f(i-1,j),f(i,j-1))
+ */
+namespace MaxValueOfGifts{
+    int getMaxValue_solution1(const vector<vector<int>> &input){
+        if (input.size() == 0) return 0;
+        vector<vector<int>> dp(input.size(), vector<int>(input[0].size(), 0));
+        dp[0][0] = input[0][0];
+        for (int i = 1; i < input.size(); i++) {
+            dp[i][0] = dp[i-1][0] + input[i][0];
+        }
+        for (int j = 1; j < input[0].size(); j++) {
+            dp[0][j] = dp[0][j-1] + input[0][j];
+        }
+
+        for (int i = 1; i < input.size(); i++){
+            for (int j = 1; j < input[0].size(); j++) {
+                dp[i][j] = input[i][j] + max(dp[i-1][j], dp[i][j-1]);
+            }
+        }
+        return dp.back().back();
+    }
+}
+
+/**
+ * @name: 面试题48：最长不含重复字符的子字符串
+ * @msg: 遇到关于26个字母的题可以用一个长度为26的数组存储，无论是计数还是作为标志都可以；
+ *      本题主要是动态规划，用来记录每个位置之前的连续不重复字符长度
+ *      f(i) = distance  if f(i-1)>=distance
+ *             f(i-1)+1  else .....
+ *      return *max_element(f(i))
+ */
+namespace LongestSubstringWithoutDup{
+    int longestSubstringWithoutDuplication(const std::string& str){
+        int result = 0;
+        int* position = new int[26];
+        for (int i = 0; i<26; i++)
+            position[i] = -1;
+        vector<int> dp(str.size(), 0);
+        dp[0] = 1;
+        position[str[0]-'a'] = 0;
+        for (int i = 1; i<str.size(); i++){
+            if (position[str[i]-'a'] == -1)
+                dp[i] = dp[i-1]+1;
+            else{
+                int distance = i-position[str[i]-'a'];
+                if (distance<=dp[i-1]){
+                    dp[i] = distance;
+                }
+                else
+                    dp[i] = dp[i-1]+1;
+            }
+            position[str[i]-'a'] = i;
+            result = result<dp[i]?dp[i]:result;
+        }
+        return result;
+    }
+}
+
+/**
+ * @name: 面试题49：丑数
+ * @msg: 数学规律 逐个生成 并且比较数值 去除重复
+ */
+namespace UglyNumber{
+    int GetUglyNumber(int index){
+        if (index <= 0) return 0;
+        // lambda表达式
+        // shared_ptr<int> pUglyNumbers = make_shared<int>(new int[index], [](int *p){delete [] p;});
+        int *pUglyNumbers = new int[index];
+        pUglyNumbers[0] = 1;
+        int nextUglyNumberIndex = 1;
+        int *pMultiply2 = pUglyNumbers;
+        int *pMultiply3 = pUglyNumbers;
+        int *pMultiply5 = pUglyNumbers;
+        while (nextUglyNumberIndex < index)
+        {
+            int minN = min(min(*pMultiply2*2, *pMultiply3*3),*pMultiply5*5);
+            pUglyNumbers[nextUglyNumberIndex] = minN;
+            while(*pMultiply2 * 2 <= pUglyNumbers[nextUglyNumberIndex])
+                ++pMultiply2;
+            while(*pMultiply3 * 3 <= pUglyNumbers[nextUglyNumberIndex])
+                ++pMultiply3;
+            while(*pMultiply5 * 5 <= pUglyNumbers[nextUglyNumberIndex])
+                ++pMultiply5;
+
+            ++nextUglyNumberIndex;
+        }
+        int ugly = pUglyNumbers[nextUglyNumberIndex - 1];
+        delete[] pUglyNumbers;
+        return ugly;
+    }
+}
+
+/**
+ * @name: 面试题50（一）：字符串中第一个只出现一次的字符
+ * @msg: 用数组模拟hashTable 两次遍历即可，第一次构建计数数组，第二次查询数组
+ */
+namespace FirstNotRepeatingChar{
+    char FirstNotRepeatingChar(const char* pString){
+        if (pString == nullptr) return '\0';
+        const int tableSize = 256;
+        unsigned int hashTable[tableSize];
+        for(unsigned int i = 0; i < tableSize; ++i)
+            hashTable[i] = 0;
+        const char* pStringCopy = pString;
+        while (*pStringCopy!='\0')
+            hashTable[*(pStringCopy++)]++;
+        pStringCopy = pString;
+        while (*pStringCopy!='\0'){
+            if (hashTable[*(pStringCopy)] == 1)
+                break;
+            else
+                pStringCopy++;
+        }
+
+        return *pStringCopy;
+    }
+}
+
+/**
+ * @name: 面试题50（二）：字符流中第一个只出现一次的字符
+ * @msg: 类似面试题50（一）  只不过hashTable中int数值附有更多含义，-1是表明没有这个字符，-2是表明多个字符，index>=0表明只出现一次的位置
+ */
+namespace FirstCharacterInStream{
+    class CharStatistics
+    {
+    public:
+        CharStatistics() : index(0)
+        {
+            for(int i = 0; i < 256; ++i)
+                occurrence[i] = -1;
+        }
+
+        void Insert(char ch)
+        {
+            if (occurrence[ch] == -1)
+                occurrence[ch] = index;
+            else if(occurrence[ch] >= 0)
+                occurrence[ch] = -2;
+
+            index++;
+            
+        }
+
+        char FirstAppearingOnce()
+        {
+            char ch = '\0';
+            int minIndex = numeric_limits<int>::max();
+            for(int i = 0; i < 256; ++i)
+            {
+                if(occurrence[i] >= 0 && occurrence[i] < minIndex)
+                {
+                    ch = (char) i;
+                    minIndex = occurrence[i];
+                }
+            }
+
+            return ch;
+        }
+
+    private:
+        // occurrence[i]: A character with ASCII value i;
+        // occurrence[i] = -1: The character has not found;
+        // occurrence[i] = -2: The character has been found for mutlple times
+        // occurrence[i] >= 0: The character has been found only once
+        int occurrence[256];
+        int index;
+    };
+}
+
+/**
+ * @name: 面试题63：股票的最大利润
+ * @msg:  leetcode股票类题型集合 
+ */
+namespace MaximalProfit{
+    /**
+     * @name: leetcode-121-买卖股票的最佳时机
+     * 假设把某股票的价格按照时间先后顺序存储在数组中，请问买卖交易该股
+     * 票可能获得的利润是多少？例如一只股票在某些时间节点的价格为{9, 11, 8, 5,
+     * 7, 12, 16, 14}。如果我们能在价格为5的时候买入并在价格为16时卖出，则能
+     * 收获最大的利润11。          
+     * @msg: 一次遍历，每次记录前i-1个元素的最小值，并且和当前数值计算最大差值，如果差值大于当前的，就更新
+     *       最终差值为正的就是最大收益。
+     */    
+    int MaxProfit_1(vector<int> &input){
+        if (input.size() <= 2) return 0;
+        int minOfFront = input[0];
+        int maxOfBack = input[1];
+        int i = 1;
+        for (; i<input.size()-1; i++){
+            minOfFront = minOfFront<=input[i]?minOfFront:input[i];
+            maxOfBack = maxOfBack>input[i+1]?maxOfBack:input[i+1];
+        }
+        return maxOfBack-minOfFront;
+    }
+       
+    /**
+     * @name: leetcode-122-买卖股票的最佳时机 II
+     * 给定一个数组，它的第 i 个元素是一支给定股票第 i 天的价格。
+     * 设计一个算法来计算你所能获取的最大利润。你可以尽可能地完成更多的交易（多次买卖一支股票）。
+     * 注意：你不能同时参与多笔交易（你必须在再次购买前出售掉之前的股票）。
+     * @msg: 1.暴力法，dfs，遍历所有情况，子序列里面继续买入卖出
+     *
+     *       2.动态规划，找寻状态转移方程
+     *         dp[i][0 or 1] 第i天（持有或不持有）最大收益
+     *         dp[i][0] = max(dp[i-1][1]+prices[i], dp[i-1][0])
+     *         dp[i][1] = max(dp[i-1][0]-prices[i], dp[i-1][1])
+     *       3.贪心
+     *         
+     */    
+    // 1.暴力法，dfs，遍历所有情况，子序列里面继续买入卖出
+    int maxProfitDfs_2(vector<int>& prices, int day){
+        if (day > prices.size()-1)
+            return 0;
+        int maxP = 0;
+        for (int i = day; i<prices.size()-1; i++){
+            int maxProfitNumber = 0;
+            for (int j = i+1; j<prices.size(); j++){
+                if (prices[i]<prices[j]){
+                    int profit = maxProfitDfs_2(prices,  j+1) - prices[i] + prices[j];
+                    maxProfitNumber = max(maxProfitNumber, profit);
+                }
+            }
+            maxP = max(maxProfitNumber, maxP);
+        }
+        return maxP;
+    }
+    // 2.动态规划，找寻状态转移方程
+    int maxProfitDP_2(vector<int>& prices){
+        if (prices.size() < 2)
+            return 0;
+        vector<vector<int>> dp(prices.size(), vector<int>(2, 0));
+        dp[0][0] = 0;
+        dp[0][1] = -prices[0];
+        int i = 1;
+        for (; i<prices.size(); i++){
+            dp[i][0] = max(dp[i-1][1]+prices[i], dp[i-1][0]);
+            dp[i][1] = max(dp[i-1][0]-prices[i], dp[i-1][1]);
+        }
+        return dp[prices.size()-1][0];
+    }
+    int maxProfit_2(vector<int>& prices) {
+        // return maxProfitDfs(prices, 0);
+        return maxProfitDP_2(prices);
+    }
+
+    /**
+     * @name: leetcode-123-买卖股票的最佳时机 III
+     * 给定一个数组，它的第 i 个元素是一支给定的股票在第 i 天的价格。
+     * 设计一个算法来计算你所能获取的最大利润。你最多可以完成 两(k)笔 交易
+     * 注意: 你不能同时参与多笔交易（你必须在再次购买前出售掉之前的股票）。
+     * @msg: 1.暴力法，dfs，遍历所有情况，子序列里面继续买入卖出，加入次数限制
+     *       2.动态规划
+     *          dp[i][k][0 or 1]  前i个并且买入k次后 0 不持有， 1 持有
+     *          dp[i][k][0] = dp[i-1][k][1]+prices[i], dp[i-1][k][0]
+     *          dp[i][k][1] = dp[i-1][k-1][0]-prices[i], dp[i-1][k][1]
+     */    
+    int maxProfitDfs_3(vector<int>& prices, int day, int k){
+        if (day>prices.size()-1)
+            return 0;
+        int maxP = 0;
+        for (int i = day; i<prices.size(); i++){
+            int maxProfitNumber = 0;
+            for (int j = i+1; j<prices.size(); j++){
+                if (prices[i]<prices[j] && k>0){
+                    int profit = maxProfitDfs_3(prices, j+1, k-1) - prices[i] + prices[j];
+                    maxProfitNumber = max(maxProfitNumber, profit);
+                }
+            }
+            maxP = max(maxProfitNumber, maxP);
+        }
+    }
+    int maxProfitDP_3(vector<int> &prices, int k){
+        if (prices.size()==0)
+            return 0;
+        vector<vector<vector<int> > > dp(prices.size(), vector<vector<int> >(k, vector<int>(2, 0)));
+
+            
+        int i = 1;
+        for (; i<prices.size(); i++){
+            for (int j = 1; j<k; j++){
+                dp[i][j][0] = max(dp[i-1][j][1]+prices[i], dp[i-1][j][0]);
+                dp[i][j][1] = max(dp[i-1][j-1][0]-prices[i], dp[i-1][j][1]);
+            }
+        }
+        return dp[i][k][0];
+    }
+    int maxProfit_3(vector<int>& prices) {
+        return maxProfitDfs_3(prices, 0, 2);
+    }
+
+    /**
+     * @name: leetcode-309-最佳买卖股票时机含冷冻期
+     * 给定一个整数数组，其中第 i 个元素代表了第 i 天的股票价格
+     * 设计一个算法计算出最大利润。在满足以下约束条件下，你可以尽可能地完成更多的交易（多次买卖一支股票）:
+     * 你不能同时参与多笔交易（你必须在再次购买前出售掉之前的股票）
+     * 卖出股票后，你无法在第二天买入股票 (即冷冻期为 1 天)
+     * @msg: 1.暴力法 dfs 单纯加了一个冷冻期 也就是多了一个遍历在卖出日期的基础上
+     *       2.动态规划 
+     *          dp[i][0,1,2] 第i天（不持有但能买, 持有可以卖, 不持有但不能买）最大收益
+     *          dp[i][0] = max(dp[i-1][0],  dp[i-1][2]);
+     *          dp[i][1] = max(dp[i-1][0]-prices[i], dp[i-1][1]);
+     *          dp[i][2] = max(dp[i-1][0], dp[i-1][1]+prices[i], dp[i-1][2]);
+     */    
+    int maxProfitDfs_5(vector<int>& prices, int day){
+        if (day > prices.size()-1)
+            return 0;
+        int maxP = 0;
+        for (int i = day; i<prices.size(); i++){
+            int maxProfitNumber = 0;
+            for (int j = i+1; j<prices.size(); j++){
+                for (int k = j+1; k<prices.size(); k++){
+                    if (prices[i]<prices[j]){
+                        int profit = maxProfitDfs_5(prices,  k+1) - prices[i] + prices[j];
+                        maxProfitNumber = max(maxProfitNumber, profit);
+                    }
+                }
+            }
+            maxP = max(maxProfitNumber, maxP);
+        }
+        return maxP;
+    }
+    int maxProfitDP_5(vector<int>& prices){
+        if (prices.size() < 2)
+            return 0;
+        vector<vector<int>> dp(prices.size(), vector<int>(3, 0));
+        dp[0][0] = 0;
+        dp[0][1] = -prices[0];
+        dp[0][2] = 0;
+        int i = 1;
+        for (; i<prices.size(); i++){
+            dp[i][0] = max(dp[i-1][0], dp[i-1][2]);
+            dp[i][1] = max(dp[i-1][0]-prices[i], dp[i-1][1]);
+            dp[i][2] = dp[i-1][1]+prices[i];
+        }
+        return dp[prices.size()-1][0];
+    }
+    int maxProfit_5(vector<int>& prices) {
+        return maxProfitDfs_5(prices, 0);
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+namespace alibaba{
+    /**
+     * @name: 有n个物品编号为1−n，现将其重新排列，但要求相邻两物品的编号差值的绝对值不等于1，按字典序输出所有满足要求的方案
+     * @msg: dfs 全排列
+     */    
+    namespace time_7_22_1{
+        void dfs(vector<int> numbers, vector<bool> flag);
+
+        vector<vector<int>> presult;
+        int n;
+
+        vector<vector<int>> findResult(int n){
+            vector<bool> flag(n+1, true);
+            for (int i = 1; i<=n; i++){
+                flag[i] = false;
+                dfs({i}, flag);
+                flag[i] = true;
+            }
+            return presult;
+        }
+
+        void dfs(vector<int> numbers, vector<bool> flag){
+            if (numbers.size() == n){
+                presult.push_back(numbers);
+                return ;
+            }
+            for (int j = 1; j<=n; j++){
+                if (flag[j] == true){
+                    if ( numbers.back()-1==j || numbers.back()+1 == j){
+                        continue;
+                    }
+                    numbers.push_back(j);
+                    flag[j] = false;
+                    dfs(numbers, flag);
+                    
+                    numbers.pop_back();
+                    flag[j] = true;
+                }
+            }
+        }
+    }
+    /**
+     * @name: 小强有一个长度为nn的数组aa和正整数mm。他想请你帮他计算数组aa中有多少个连续子区间[l,r][l,r]，其区间内存在某个元素出现的次数不小于mm次？例如数组a=[1,2,1,2,3]a=[1,2,1,2,3]且m=2m=2，那么区间[1,3],[1,4],[1,5],[2,4],[2,5][1,3],[1,4],[1,5],[2,4],[2,5]都是满足条件的区间，但区间[3,4][3,4]等都是不满足条件的。
+     * @msg: 双指针
+     */    
+    namespace time_7_22_2{
+         int m,n; 
+        cin >> n >> m;
+        vector<int> numbers;
+        int num;
+        int ans = 0;
+        while (cin>>num)
+        {
+            numbers.push_back(num);
+        }
+        int len = numbers.size();
+        for (int i = 0; i<len; i++){
+            vector<int> count(400001,0);
+            for (int j = i; j<len; j++){
+                count[numbers[j]]++;
+                if (count[numbers[j]] >= m) 
+                    {ans += (len - j);break;}
+            }
+        }
+        cout << ans << endl;
+    }
+}

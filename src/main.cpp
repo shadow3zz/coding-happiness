@@ -1,19 +1,28 @@
 /*
+ * @Descripttion: 
+ * @version: WSL:Ubuntu-16.04
+ * @Author: shadow3zz-zhouchenghao@whut.edu.cn
+ * @Date: 2020-06-30 15:07:21
+ * @LastEditors: shadow3zz
+ * @LastEditTime: 2020-07-22 16:45:29
+ */ 
+/*
  * @Descripttion: main
  * @version: WSL:Ubuntu-16.04
  * @Author: shadow3zz-zhouchenghao@whut.edu.cn
  * @Date: 2020-01-30 13:35:17
  * @LastEditors: shadow3zz
- * @LastEditTime: 2020-06-15 22:56:12
+ * @LastEditTime: 2020-06-30 15:07:21
  */
-#include <iostream>
-#include <sstream>
-#include <cmath>
-#include <stdlib.h>
-#include <cstring>
-#include <map>
-#include <memory>
-
+// #include <iostream>
+// #include <sstream>
+// #include <cmath>
+// #include <stdlib.h>
+// #include <cstring>
+// #include <map>
+// #include <memory>
+// #include <unordered_map>
+#include <bits/stdc++.h>
 // #include <wx/wx.h>
 #include "Vector.h"
 #include "List.h"
@@ -23,6 +32,7 @@
 #include "sort.h"
 #include "jzoffer.hpp"
 #include "List.h"
+#include "HashMap.h"
 
 char *str[] = {"aaa", "aab", "aac", "zhouzhou", "yiyi"};
 
@@ -30,12 +40,30 @@ void example_vector();
 void example_list();
 void example_stack();
 void exmaple_avltree();
+void jzoffer_test();
 void leetcode_test();
 void book_exec();
 void sort_test();
 
+
 int main(int argc, char const *argv[])
 {   
+   
+    
+    // divide(12345, 12);
+    jzoffer_test();
+    // example_vector();
+    // example_list();
+    // example_stack();
+    // exmaple_avltree();
+    // leetcode_test();
+    // sort_test();
+    // book_exec();
+    system("pause");
+    return 0;
+}
+
+void jzoffer_test(){
     #if 0
     std::vector<int> input_1 = {1,2,4,2,3,3,4,5};
     duplicate::duplicate_1(input_1, 8);
@@ -86,20 +114,184 @@ int main(int argc, char const *argv[])
     bool StringPathInMatrixResult = StringPathInMatrix::StringPathInMatrix(matrix, str);
     StringPathInMatrix::Permutation(3);
     
-    #else
     cout  << RobotMove::RobotMove(10, 10, 5) << endl;
 
+    cout  << CuttingRope::maxProductAfterCutting_solution1(7) << endl;
+
+    cout << NumberOf1InBinary::NumberOf1_Solution1(10) << endl;
+    
+    Print1ToMaxOfNDigitsRecursively::PrintNumber(3);
+        
+    ListNode* pNode1 = CreateListNode(1);
+    ListNode* pNode2 = CreateListNode(2);
+    ListNode* pNode3 = CreateListNode(2);
+    ListNode* pNode4 = CreateListNode(3);
+    ListNode* pNode5 = CreateListNode(4);
+    ListNode* pNode6 = CreateListNode(4);
+    ListNode* pNode7 = CreateListNode(5);
+
+    ConnectListNodes(pNode1, pNode2);
+    ConnectListNodes(pNode2, pNode3);
+    ConnectListNodes(pNode3, pNode4);
+    ConnectListNodes(pNode4, pNode5);
+    ConnectListNodes(pNode5, pNode6);
+    ConnectListNodes(pNode6, pNode7);
+
+    ListNode* pHead = pNode1;
+
+    DeleteListNode::DeleteDuplication(&pHead);
+    
+    bool RE_result_1 = RegularExpressions::match("aaa", "ab*ac*a");
+    bool RE_result_2 = RegularExpressions::match("bcbbabab", ".*a*a");
+
+    vector<int> numbers = {1, 2, 3, 4, 5, 6, 7};
+    ReorderArray::ReorderOddEven_1(numbers);
+    
+    printf("=====Test1 starts:=====\n");
+    ListNode* pNode1 = CreateListNode(1);
+    ListNode* pNode2 = CreateListNode(2);
+    ListNode* pNode3 = CreateListNode(3);
+    ListNode* pNode4 = CreateListNode(4);
+    ListNode* pNode5 = CreateListNode(5);
+
+    ConnectListNodes(pNode1, pNode2);
+    ConnectListNodes(pNode2, pNode3);
+    ConnectListNodes(pNode3, pNode4);
+    ConnectListNodes(pNode4, pNode5);
+
+    printf("expected result: 4.\n");
+    ListNode* pNode = KthNodeFromEnd::FindKthToTail(pNode1, 0);
+    
+    ListNode* pNode1 = CreateListNode(1);
+    ListNode* pNode2 = CreateListNode(2);
+    ListNode* pNode3 = CreateListNode(3);
+    ListNode* pNode4 = CreateListNode(4);
+    ListNode* pNode5 = CreateListNode(5);
+
+    ConnectListNodes(pNode1, pNode2);
+    ConnectListNodes(pNode2, pNode3);
+    ConnectListNodes(pNode3, pNode4);
+    ConnectListNodes(pNode4, pNode5);
+    ConnectListNodes(pNode5, pNode5);
+    EntryNodeInListLoop::MeetingNode(pNode1);
+    
+    int rows = 1, columns = 5;
+    vector<vector<int> > numbers(rows, vector<int>(columns, 0));
+    for(int i = 0; i < rows; ++i)
+    {
+        for(int j = 0; j < columns; ++j)
+        {
+            numbers[i][j] = i * columns + j + 1;
+        }
+    }
+
+    PrintMatrix::PrintMatrixClockwisely(numbers);
+
+    vector<int> push = {1};
+    vector<int> pop = {4};
+
+    bool result = StackPushPopOrder::IsPopOrder(push, pop);
+
+    vector<int> data =   {4, 8, 6, 12, 16, 14, 10};
+    SquenceOfBST::VerifySquenceOfBST(data);
+
+    BinaryTreeNode* pNode10 = CreateBinaryTreeNode(10);
+    BinaryTreeNode* pNode5 = CreateBinaryTreeNode(5);
+    BinaryTreeNode* pNode12 = CreateBinaryTreeNode(12);
+    BinaryTreeNode* pNode4 = CreateBinaryTreeNode(4);
+    BinaryTreeNode* pNode7 = CreateBinaryTreeNode(7);
+
+    ConnectBinaryTreeNode(pNode10, pNode5, pNode12);
+    ConnectBinaryTreeNode(pNode5, pNode4, pNode7);
+    
+    PathInTree::FindPath(pNode10, 22);
+
+    ComplexListNode* pNode1 = CreateNode(1);
+    ComplexListNode* pNode2 = CreateNode(2);
+    ComplexListNode* pNode3 = CreateNode(3);
+    ComplexListNode* pNode4 = CreateNode(4);
+    ComplexListNode* pNode5 = CreateNode(5);
+
+    BuildNodes(pNode1, pNode2, pNode3);
+    BuildNodes(pNode2, pNode3, pNode5);
+    BuildNodes(pNode3, pNode4, nullptr);
+    BuildNodes(pNode4, pNode5, pNode2);
+
+    ComplexListNode* pClone = CopyComplexList::Clone(pNode1);
+
+    BinaryTreeNode* pNode10 = CreateBinaryTreeNode(10);
+    BinaryTreeNode* pNode6 = CreateBinaryTreeNode(6);
+    BinaryTreeNode* pNode14 = CreateBinaryTreeNode(14);
+    BinaryTreeNode* pNode4 = CreateBinaryTreeNode(4);
+    BinaryTreeNode* pNode8 = CreateBinaryTreeNode(8);
+    BinaryTreeNode* pNode12 = CreateBinaryTreeNode(12);
+    BinaryTreeNode* pNode16 = CreateBinaryTreeNode(16);
+
+    ConnectBinaryTreeNode(pNode10, pNode6, pNode14);
+    ConnectBinaryTreeNode(pNode6, pNode4, pNode8);
+    ConnectBinaryTreeNode(pNode14, pNode12, pNode16);
+    ConvertBinarySearchTree::Convert(pNode10);
+
+    string s = "abcd";
+    StringPermutation::Permutation(s);
+    StringPermutation::Combination(s);
+    vector<int> cubic = {0,1,2,3,4,5,6,7};
+    bool cubicresult = StringPermutation::CubicEqualExist(cubic);
+
+    vector<int> numbers = {2, 2, 2, 2, 2, 1, 3, 4, 5};
+    MoreThanHalfNumber::CheckMoreThanHalf(numbers);
+
+    vector<int> vec = {3,2,4,1,6,5,8};
+    KLeastNumbers::GetLeastNumbers_Solution1(vec, 3);
+    
+    vector<int> data = {1, -2, 3, 10, -4, 7, 2, -5};
+      vector<int> newData(&data[8],&data[data.size()]);
+     cout << GreatestSumOfSubarrays::FindGreatestSumOfSubArray(data);
+
+     NumberOf1::NumberOf1Between1AndN(21345);
+
+     cout << DigitsInSequence::digitAtIndex(1001);
+
+     vector<int> input = {1, 11, 111};
+    SortArrayForMinNumber::PrintMinNumber(input);
+
+     TranslateNumbersToStrings::GetTranslationCount(12258);
+
+    vector<vector<int>> values = {
+        { 1, 2, 3 },
+        { 4, 5, 6 },
+        { 7, 8, 9 }
+    };
+    MaxValueOfGifts::getMaxValue_solution1(values); 
+    
+    LongestSubstringWithoutDup::longestSubstringWithoutDuplication("abcacfrar");
+    
+    UglyNumber::GetUglyNumber(30);
+
+    FirstNotRepeatingChar::FirstNotRepeatingChar("google");
+
+    bool RE_result_2 = RegularExpressions::match("aaaaaaaaaaab", ".*a*a*a*a*a*a*a*a*a*a*b");
+
+    vector<int> numbers =  { 9, 11, 5, 7, 16, 1, 4, 2 };
+    MaximalProfit::maxProfit_3(numbers);
+    #else
+    // ListNode* pNode1 = CreateListNode(1);
+    // ListNode* pNode2 = CreateListNode(4);
+    // ListNode* pNode3 = CreateListNode(3);
+    // ListNode* pNode4 = CreateListNode(2);
+    // ListNode* pNode5 = CreateListNode(5);
+    // ListNode* pNode6 = CreateListNode(2);
+    // ConnectListNodes(pNode1, pNode2);
+    // ConnectListNodes(pNode2, pNode3);
+    // ConnectListNodes(pNode3, pNode4);
+    // ConnectListNodes(pNode4, pNode5);
+    // ConnectListNodes(pNode5, pNode6);
+    
+    // partition(pNode1, 3);
+    vector<int> vec = {4,2,3,5,7,1,9,12,4};
+    SORT::quickSortLoop<int>(vec);
     
     #endif
-    // example_vector();
-    // example_list();
-    // example_stack();
-    // exmaple_avltree();
-    leetcode_test();
-    // sort_test();
-    // book_exec();
-    system("pause");
-    return 0;
 }
 
 void example_vector()
@@ -276,8 +468,14 @@ void leetcode_test()
     s.uniquePathsWithObstacles(obstacleGrid);
 
      s.getPermutation(4, 7);
-#endif 
 
+     vector<vector<int> > image = {{1,1,1},{1,1,0},{1,0,1}};
+    s.floodFill(image, 1, 1, 2);
+#endif 
+    vector<int> nums1 = {1};
+    vector<int> nums2 = {2,3,4,5,6};
+
+    s.findMedianSortedArrays(nums1, nums2);
 
 }
 
